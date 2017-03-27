@@ -28,31 +28,11 @@ import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
 import io.vertx.ext.unit.junit.VertxUnitRunner;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
 
 @RunWith(VertxUnitRunner.class)
 public class AnnotationHandlerTest {
 
 	private static Vertx vertx = Vertx.vertx();
-
-	@Path("/hello")
-	public static class HelloResource {
-
-		@Get("/g")
-		public void get(RoutingContext ctx) {
-			ctx.response().end("Hello ws!");
-		}
-
-		@Post("/p")
-		@Produces({ "text/plain" })
-		@Consumes({ "text/json" })
-		public void post(RoutingContext ctx) {
-			ctx.request().bodyHandler(rs -> {
-				String content = rs.toJsonObject().getString("content");
-				ctx.response().end("Hello " + content + "!");
-			});
-		}
-	}
 
 	@Test
 	public void testHelloResourceGet(TestContext ctx) {

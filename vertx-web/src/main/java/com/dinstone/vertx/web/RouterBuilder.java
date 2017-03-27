@@ -17,6 +17,8 @@
 package com.dinstone.vertx.web;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.dinstone.vertx.web.annotation.handler.AnnotationHandler;
 import com.dinstone.vertx.web.annotation.handler.WebAnnotationHandler;
@@ -30,7 +32,7 @@ public interface RouterBuilder {
 
 		private final Router router;
 
-		private AnnotationHandler handler;
+		private final List<AnnotationHandler> handlers = new ArrayList<>();
 
 		public DefaultRouterBuilder(Vertx vertx) {
 			this.router = Router.router(vertx);
@@ -52,7 +54,9 @@ public interface RouterBuilder {
 		private void process(Object instance) {
 			final Class<?> clazz = instance.getClass();
 			for (final Method method : clazz.getMethods()) {
-				handler.process(router, instance, clazz, method);
+				for (AnnotationHandler annotationHandler : handlers) {
+					annotationHandler.process(router, instance, clazz, method);
+				}
 			}
 		}
 
@@ -64,7 +68,7 @@ public interface RouterBuilder {
 		@Override
 		public RouterBuilder handler(AnnotationHandler handler) {
 			if (handler != null) {
-				this.handler = handler;
+				this.handlers.add(handler);
 			}
 			return this;
 		}
