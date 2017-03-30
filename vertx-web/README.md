@@ -28,7 +28,8 @@ deployment web service like this:
 
 ```java
 	Vertx vertx = Vertx.vertx();
-	Router router = RouterBuilder.create(vertx).route(new HelloResource()).build();
+	Router router = Router.router(vertx);
+	RouteInitializer.create().route(new HelloResource()).initialize(router);
 	vertx.createHttpServer().requestHandler(router::accept).listen(8080);
 	System.out.println("server work on 8080");
 ```

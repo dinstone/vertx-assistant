@@ -13,13 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dinstone.vertx.web.annotation.handler;
+package com.dinstone.vertx.web;
 
 import java.lang.reflect.Method;
 
 import io.vertx.ext.web.Router;
 
-public interface AnnotationHandler {
+public interface RouteResolver {
 
 	void process(Router router, Object instance, Class<?> clazz, Method method);
 

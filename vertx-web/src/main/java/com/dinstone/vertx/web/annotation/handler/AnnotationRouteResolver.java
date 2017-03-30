@@ -23,6 +23,7 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
+import com.dinstone.vertx.web.RouteResolver;
 import com.dinstone.vertx.web.annotation.Connect;
 import com.dinstone.vertx.web.annotation.Consumes;
 import com.dinstone.vertx.web.annotation.Delete;
@@ -40,7 +41,7 @@ import io.vertx.ext.web.Route;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
 
-public class WebAnnotationHandler implements AnnotationHandler {
+public class AnnotationRouteResolver implements RouteResolver {
 
 	private static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
 

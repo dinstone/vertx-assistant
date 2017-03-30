@@ -19,7 +19,7 @@ package com.dinstone.vertx.web.annotation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.dinstone.vertx.web.RouterBuilder;
+import com.dinstone.vertx.web.RouteInitializer;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
@@ -37,7 +37,8 @@ public class AnnotationHandlerTest {
 	@Test
 	public void testHelloResourceGet(TestContext ctx) {
 		final Async async = ctx.async();
-		final Router router = RouterBuilder.create(vertx).route(new HelloResource()).build();
+		final Router router = Router.router(vertx);
+		RouteInitializer.create().route(new HelloResource()).initialize(router);
 		vertx.createHttpServer().requestHandler(router::accept).listen(8080, server -> {
 			if (server.failed()) {
 				ctx.fail(server.cause());
@@ -67,7 +68,8 @@ public class AnnotationHandlerTest {
 	@Test
 	public void testHelloResourcePost(TestContext ctx) {
 		final Async async = ctx.async();
-		final Router router = RouterBuilder.create(vertx).route(new HelloResource()).build();
+		final Router router = Router.router(vertx);
+		RouteInitializer.create().route(new HelloResource()).initialize(router);
 		vertx.createHttpServer().requestHandler(router::accept).listen(8080, server -> {
 			if (server.failed()) {
 				ctx.fail(server.cause());
