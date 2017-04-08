@@ -57,61 +57,61 @@ public class AnnotationRouteResolver implements RouteResolver {
 		String servicePath = getServicePath(clazz);
 		if (isCompatible(method, Get.class, RoutingContext.class)) {
 			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-			Route route = router.get(servicePath + getAnnotation(method, Get.class).value())
-					.handler(wrap(instance, methodHandle));
-			contentType(route, clazz, method);
+			String path = servicePath + getAnnotation(method, Get.class).value();
+			Route route = router.get(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
 		}
 		if (isCompatible(method, Post.class, RoutingContext.class)) {
 			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-			Route route = router.post(servicePath + getAnnotation(method, Post.class).value())
-					.handler(wrap(instance, methodHandle));
-			contentType(route, clazz, method);
+			String path = servicePath + getAnnotation(method, Post.class).value();
+			Route route = router.post(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
 		}
 		if (isCompatible(method, Put.class, RoutingContext.class)) {
 			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-			Route route = router.put(servicePath + getAnnotation(method, Put.class).value())
-					.handler(wrap(instance, methodHandle));
-			contentType(route, clazz, method);
+			String path = servicePath + getAnnotation(method, Put.class).value();
+			Route route = router.put(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
 		}
 		if (isCompatible(method, Delete.class, RoutingContext.class)) {
 			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-			Route route = router.delete(servicePath + getAnnotation(method, Delete.class).value())
-					.handler(wrap(instance, methodHandle));
-			contentType(route, clazz, method);
+			String path = servicePath + getAnnotation(method, Delete.class).value();
+			Route route = router.delete(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
 		}
 		if (isCompatible(method, Connect.class, RoutingContext.class)) {
 			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-			Route route = router.connect(servicePath + getAnnotation(method, Connect.class).value())
-					.handler(wrap(instance, methodHandle));
-			contentType(route, clazz, method);
+			String path = servicePath + getAnnotation(method, Connect.class).value();
+			Route route = router.connect(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
 		}
 		if (isCompatible(method, Options.class, RoutingContext.class)) {
 			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-			Route route = router.options(servicePath + getAnnotation(method, Options.class).value())
-					.handler(wrap(instance, methodHandle));
-			contentType(route, clazz, method);
+			String path = servicePath + getAnnotation(method, Options.class).value();
+			Route route = router.options(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
 		}
 		if (isCompatible(method, Head.class, RoutingContext.class)) {
 			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-			Route route = router.head(servicePath + getAnnotation(method, Head.class).value())
-					.handler(wrap(instance, methodHandle));
-			contentType(route, clazz, method);
+			String path = servicePath + getAnnotation(method, Head.class).value();
+			Route route = router.head(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
 		}
 		if (isCompatible(method, Patch.class, RoutingContext.class)) {
 			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-			Route route = router.patch(servicePath + getAnnotation(method, Patch.class).value())
-					.handler(wrap(instance, methodHandle));
-			contentType(route, clazz, method);
+			String path = servicePath + getAnnotation(method, Patch.class).value();
+			Route route = router.patch(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
 		}
 		if (isCompatible(method, Path.class, RoutingContext.class)) {
 			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-			Route route = router.route(servicePath + getAnnotation(method, Path.class).value())
-					.handler(wrap(instance, methodHandle));
-			contentType(route, clazz, method);
+			String path = servicePath + getAnnotation(method, Path.class).value();
+			Route route = router.route(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
 		}
 	}
 
-	private void contentType(Route route, final Class<?> clazz, final Method method) {
+	private static void andRouteBasedContentType(Route route, final Class<?> clazz, final Method method) {
 		if (route != null) {
 			String[] produces = getProduces(clazz, method);
 			String[] consumes = getConsumes(clazz, method);

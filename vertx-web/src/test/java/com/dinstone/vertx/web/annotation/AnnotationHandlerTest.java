@@ -19,7 +19,7 @@ package com.dinstone.vertx.web.annotation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.dinstone.vertx.web.RouteInitializer;
+import com.dinstone.vertx.web.RouteBinder;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
@@ -38,15 +38,15 @@ public class AnnotationHandlerTest {
 	public void testHelloResourceGet(TestContext ctx) {
 		final Async async = ctx.async();
 		final Router router = Router.router(vertx);
-		RouteInitializer.create().route(new HelloResource()).initialize(router);
-		vertx.createHttpServer().requestHandler(router::accept).listen(8080, server -> {
+		RouteBinder.create().service(new HelloResource()).bind(router);
+		vertx.createHttpServer().requestHandler(router::accept).listen(8081, server -> {
 			if (server.failed()) {
 				ctx.fail(server.cause());
 				return;
 			}
 
 			HttpClient httpClient = vertx.createHttpClient();
-			httpClient.get(8080, "localhost", "/hello/g").exceptionHandler(ctx::fail).handler(res -> {
+			httpClient.get(8081, "localhost", "/hello/g").exceptionHandler(ctx::fail).handler(res -> {
 				ctx.assertEquals(200, res.statusCode());
 				res.bodyHandler(buff -> {
 					ctx.assertEquals("Hello ws!", buff.toString());
@@ -69,15 +69,15 @@ public class AnnotationHandlerTest {
 	public void testHelloResourcePost(TestContext ctx) {
 		final Async async = ctx.async();
 		final Router router = Router.router(vertx);
-		RouteInitializer.create().route(new HelloResource()).initialize(router);
-		vertx.createHttpServer().requestHandler(router::accept).listen(8080, server -> {
+		RouteBinder.create().service(new HelloResource()).bind(router);
+		vertx.createHttpServer().requestHandler(router::accept).listen(8081, server -> {
 			if (server.failed()) {
 				ctx.fail(server.cause());
 				return;
 			}
 
 			HttpClient httpClient = vertx.createHttpClient();
-			httpClient.post(8080, "localhost", "/hello/p").putHeader("Content-Type", "text/json")
+			httpClient.post(8081, "localhost", "/hello/p").putHeader("Content-Type", "text/json")
 					.exceptionHandler(ctx::fail).handler(res -> {
 						ctx.assertEquals(200, res.statusCode());
 						ctx.assertEquals("text/plain", res.getHeader("Content-Type"));

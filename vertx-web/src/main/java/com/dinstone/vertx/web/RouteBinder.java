@@ -24,31 +24,29 @@ import com.dinstone.vertx.web.annotation.handler.AnnotationRouteResolver;
 
 import io.vertx.ext.web.Router;
 
-public interface RouteInitializer {
+public interface RouteBinder {
 
-	class DefaultRouteInitializer implements RouteInitializer {
+	class DefaultRouteBinder implements RouteBinder {
 
 		private final List<Object> services = new ArrayList<>();
 
 		private final List<RouteResolver> resolvers = new ArrayList<>();
 
-		public DefaultRouteInitializer() {
+		public DefaultRouteBinder() {
 			resolver(new AnnotationRouteResolver());
 		}
 
 		@Override
-		public RouteInitializer route(Object... objs) {
-			if (objs != null) {
-				for (Object object : objs) {
-					services.add(object);
-				}
+		public RouteBinder service(Object service) {
+			if (service != null) {
+				services.add(service);
 			}
 
 			return this;
 		}
 
 		@Override
-		public RouteInitializer resolver(RouteResolver resolver) {
+		public RouteBinder resolver(RouteResolver resolver) {
 			if (resolver != null) {
 				this.resolvers.add(resolver);
 			}
@@ -56,7 +54,7 @@ public interface RouteInitializer {
 		}
 
 		@Override
-		public RouteInitializer initialize(Router router) {
+		public RouteBinder bind(Router router) {
 			for (Object service : services) {
 				process(router, service);
 			}
@@ -74,13 +72,13 @@ public interface RouteInitializer {
 		}
 	}
 
-	public static RouteInitializer create() {
-		return new DefaultRouteInitializer();
+	public static RouteBinder create() {
+		return new DefaultRouteBinder();
 	}
 
-	public RouteInitializer resolver(RouteResolver resolver);
+	public RouteBinder resolver(RouteResolver resolver);
 
-	public RouteInitializer route(Object... services);
+	public RouteBinder service(Object service);
 
-	public RouteInitializer initialize(Router router);
+	public RouteBinder bind(Router router);
 }

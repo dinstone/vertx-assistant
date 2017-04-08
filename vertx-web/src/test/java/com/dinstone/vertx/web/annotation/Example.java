@@ -15,7 +15,7 @@
  */
 package com.dinstone.vertx.web.annotation;
 
-import com.dinstone.vertx.web.RouteInitializer;
+import com.dinstone.vertx.web.RouteBinder;
 
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
@@ -27,7 +27,7 @@ public class Example {
 
 		Router router = Router.router(vertx);
 
-		RouteInitializer.create().resolver(new MethodNameRouteResolver()).route(new HelloResource()).initialize(router);
+		RouteBinder.create().resolver(new MethodNameRouteResolver()).service(new HelloResource()).bind(router);
 
 		vertx.createHttpServer().requestHandler(router::accept).listen(8080);
 		System.out.println("server work on 8080");
