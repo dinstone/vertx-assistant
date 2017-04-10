@@ -38,7 +38,7 @@ public class AnnotationHandlerTest {
 	public void testHelloResourceGet(TestContext ctx) {
 		final Async async = ctx.async();
 		final Router router = Router.router(vertx);
-		RouteBinder.create().service(new HelloResource()).bind(router);
+		RouteBinder.create().handler(new HelloResource()).bind(router);
 		vertx.createHttpServer().requestHandler(router::accept).listen(8081, server -> {
 			if (server.failed()) {
 				ctx.fail(server.cause());
@@ -69,7 +69,7 @@ public class AnnotationHandlerTest {
 	public void testHelloResourcePost(TestContext ctx) {
 		final Async async = ctx.async();
 		final Router router = Router.router(vertx);
-		RouteBinder.create().service(new HelloResource()).bind(router);
+		RouteBinder.create().handler(new HelloResource()).bind(router);
 		vertx.createHttpServer().requestHandler(router::accept).listen(8081, server -> {
 			if (server.failed()) {
 				ctx.fail(server.cause());

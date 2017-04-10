@@ -27,7 +27,7 @@ public class Example {
 
 		Router router = Router.router(vertx);
 
-		RouteBinder.create().resolver(new MethodNameRouteResolver()).service(new HelloResource()).bind(router);
+		RouteBinder.create().resolver(new MethodNameRouteResolver()).handler(new HelloResource()).bind(router);
 
 		vertx.createHttpServer().requestHandler(router::accept).listen(8080);
 		System.out.println("server work on 8080");

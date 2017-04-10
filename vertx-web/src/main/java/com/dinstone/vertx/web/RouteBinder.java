@@ -37,7 +37,7 @@ public interface RouteBinder {
 		}
 
 		@Override
-		public RouteBinder service(Object service) {
+		public RouteBinder handler(Object service) {
 			if (service != null) {
 				services.add(service);
 			}
@@ -78,7 +78,7 @@ public interface RouteBinder {
 
 	public RouteBinder resolver(RouteResolver resolver);
 
-	public RouteBinder service(Object service);
+	public RouteBinder handler(Object service);
 
 	public RouteBinder bind(Router router);
 }
