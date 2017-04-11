@@ -7,6 +7,7 @@
 	<packaging>pom</packaging>
 	<name>vertx-assistant</name>
 	<url>https://github.com/dinstone/vertx-assistant.git</url>
+	<description>vertx-assistant project for vert.x develop</description>
 	<inceptionYear>2016~2017</inceptionYear>
 	<licenses>
 		<license>
@@ -39,14 +40,14 @@
 	</developers>
 	<distributionManagement>
 		<repository>
-			<id>releases</id>
+			<id>sonatype-nexus-staging</id>
 			<name>Nexus Release Repository</name>
-			<url>http://123.56.132.51:8081/nexus/content/repositories/releases/</url>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
 		</repository>
 		<snapshotRepository>
-			<id>snapshots</id>
-			<name>Nexus Snapshot Repository</name>
-			<url>http://123.56.132.51:8081/nexus/content/repositories/snapshots/</url>
+			<id>sonatype-nexus-snapshots</id>
+			<name>Sonatype Nexus Snapshots</name>
+			<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
 		</snapshotRepository>
 	</distributionManagement>
 	<properties>
@@ -207,4 +208,5 @@
 	<modules>
 		<module>vertx-web</module>
 	</modules>
+
 </project>
