@@ -13,7 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dinstone.vertx.web.annotation;
+package com.dinstone.vertx.web.resource;
+
+import com.dinstone.vertx.web.annotation.Consumes;
+import com.dinstone.vertx.web.annotation.Get;
+import com.dinstone.vertx.web.annotation.Path;
+import com.dinstone.vertx.web.annotation.Post;
+import com.dinstone.vertx.web.annotation.Produces;
 
 import io.vertx.ext.web.RoutingContext;
 

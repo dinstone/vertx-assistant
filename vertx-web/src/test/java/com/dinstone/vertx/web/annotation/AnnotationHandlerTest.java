@@ -19,7 +19,8 @@ package com.dinstone.vertx.web.annotation;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.dinstone.vertx.web.RouteBinder;
+import com.dinstone.vertx.web.RouterBuilder;
+import com.dinstone.vertx.web.resource.HelloResource;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
@@ -32,71 +33,71 @@ import io.vertx.ext.web.Router;
 @RunWith(VertxUnitRunner.class)
 public class AnnotationHandlerTest {
 
-	private static Vertx vertx = Vertx.vertx();
+    private static Vertx vertx = Vertx.vertx();
 
-	@Test
-	public void testHelloResourceGet(TestContext ctx) {
-		final Async async = ctx.async();
-		final Router router = Router.router(vertx);
-		RouteBinder.create().handler(new HelloResource()).bind(router);
-		vertx.createHttpServer().requestHandler(router::accept).listen(8081, server -> {
-			if (server.failed()) {
-				ctx.fail(server.cause());
-				return;
-			}
+    @Test
+    public void testHelloResourceGet(TestContext ctx) {
+        final Async async = ctx.async();
 
-			HttpClient httpClient = vertx.createHttpClient();
-			httpClient.get(8081, "localhost", "/hello/g").exceptionHandler(ctx::fail).handler(res -> {
-				ctx.assertEquals(200, res.statusCode());
-				res.bodyHandler(buff -> {
-					ctx.assertEquals("Hello ws!", buff.toString());
+        final Router router = RouterBuilder.create(vertx).handler(new HelloResource()).build();
+        vertx.createHttpServer().requestHandler(router::accept).listen(8081, server -> {
+            if (server.failed()) {
+                ctx.fail(server.cause());
+                return;
+            }
 
-					server.result().close(v -> {
-						if (v.failed()) {
-							ctx.fail(v.cause());
-							return;
-						}
-						async.complete();
-					});
-				});
-			}).end();
-		});
+            HttpClient httpClient = vertx.createHttpClient();
+            httpClient.get(8081, "localhost", "/hello/g").exceptionHandler(ctx::fail).handler(res -> {
+                ctx.assertEquals(200, res.statusCode());
+                res.bodyHandler(buff -> {
+                    ctx.assertEquals("Hello ws!", buff.toString());
 
-		async.await();
-	}
+                    server.result().close(v -> {
+                        if (v.failed()) {
+                            ctx.fail(v.cause());
+                            return;
+                        }
+                        async.complete();
+                    });
+                });
+            }).end();
+        });
 
-	@Test
-	public void testHelloResourcePost(TestContext ctx) {
-		final Async async = ctx.async();
-		final Router router = Router.router(vertx);
-		RouteBinder.create().handler(new HelloResource()).bind(router);
-		vertx.createHttpServer().requestHandler(router::accept).listen(8081, server -> {
-			if (server.failed()) {
-				ctx.fail(server.cause());
-				return;
-			}
+        async.await();
+    }
 
-			HttpClient httpClient = vertx.createHttpClient();
-			httpClient.post(8081, "localhost", "/hello/p").putHeader("Content-Type", "text/json")
-					.exceptionHandler(ctx::fail).handler(res -> {
-						ctx.assertEquals(200, res.statusCode());
-						ctx.assertEquals("text/plain", res.getHeader("Content-Type"));
+    @Test
+    public void testHelloResourcePost(TestContext ctx) {
+        final Async async = ctx.async();
 
-						res.bodyHandler(buff -> {
-							ctx.assertEquals("Hello ws!", buff.toString());
+        final Router router = RouterBuilder.create(vertx).handler(new HelloResource()).build();
+        vertx.createHttpServer().requestHandler(router::accept).listen(8081, server -> {
+            if (server.failed()) {
+                ctx.fail(server.cause());
+                return;
+            }
 
-							server.result().close(v -> {
-								if (v.failed()) {
-									ctx.fail(v.cause());
-									return;
-								}
-								async.complete();
-							});
-						});
-					}).end(new JsonObject().put("content", "ws").toString());
-		});
+            HttpClient httpClient = vertx.createHttpClient();
+            httpClient.post(8081, "localhost", "/hello/p").putHeader("Content-Type", "text/json")
+                .exceptionHandler(ctx::fail).handler(res -> {
+                    ctx.assertEquals(200, res.statusCode());
+                    ctx.assertEquals("text/plain", res.getHeader("Content-Type"));
 
-		async.await();
-	}
+                    res.bodyHandler(buff -> {
+                        ctx.assertEquals("Hello ws!", buff.toString());
+
+                        server.result().close(v -> {
+                            if (v.failed()) {
+                                ctx.fail(v.cause());
+                                return;
+                            }
+                            async.complete();
+                        });
+                    });
+                }).end(new JsonObject().put("content", "ws").toString());
+        });
+
+        async.await();
+    }
 
 }
