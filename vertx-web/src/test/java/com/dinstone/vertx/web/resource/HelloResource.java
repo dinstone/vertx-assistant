@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.web.resource;
 
 import com.dinstone.vertx.web.annotation.Consumes;
@@ -21,23 +22,36 @@ import com.dinstone.vertx.web.annotation.Path;
 import com.dinstone.vertx.web.annotation.Post;
 import com.dinstone.vertx.web.annotation.Produces;
 
+import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
 @Path("/hello")
 public class HelloResource {
 
-	@Get("/g")
-	public void get(RoutingContext ctx) {
-		ctx.response().end("Hello ws!");
-	}
+    @Get("/g")
+    public void get(RoutingContext ctx) {
+        ctx.response().end("Hello ws!");
+    }
 
-	@Post("/p")
-	@Produces({ "text/plain" })
-	@Consumes({ "text/json" })
-	public void post(RoutingContext ctx) {
-		ctx.request().bodyHandler(rs -> {
-			String content = rs.toJsonObject().getString("content");
-			ctx.response().end("Hello " + content + "!");
-		});
-	}
+    @Get("/g/:name")
+    public void hello(RoutingContext ctx) {
+        String message = "hello";
+        String name = ctx.request().getParam("name");
+        if (name != null) {
+            message += " " + name;
+        }
+
+        JsonObject json = new JsonObject().put("message", message);
+        ctx.response().end(json.encode());
+    }
+
+    @Post("/p")
+    @Produces({ "text/plain" })
+    @Consumes({ "text/json" })
+    public void post(RoutingContext ctx) {
+        ctx.request().bodyHandler(rs -> {
+            String content = rs.toJsonObject().getString("content");
+            ctx.response().end("Hello " + content + "!");
+        });
+    }
 }

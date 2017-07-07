@@ -10,7 +10,19 @@ public static class HelloResource {
 
     @Get("/g")
     public void get(RoutingContext ctx) {
-    	ctx.response().end("Hello ws!");
+    		ctx.response().end("Hello ws!");
+    }
+    
+    @Get("/g/:name")
+    public void hello(RoutingContext ctx) {
+        String message = "hello";
+        String name = ctx.request().getParam("name");
+        if (name != null) {
+            message += " " + name;
+        }
+
+        JsonObject json = new JsonObject().put("message", message);
+        ctx.response().end(json.encode());
     }
     
     @Post("/p")

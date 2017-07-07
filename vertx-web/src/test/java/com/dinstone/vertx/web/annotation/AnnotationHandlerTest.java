@@ -100,4 +100,35 @@ public class AnnotationHandlerTest {
         async.await();
     }
 
+    @Test
+    public void testHelloResourceGetPathParam(TestContext ctx) {
+        final Async async = ctx.async();
+
+        final Router router = RouterBuilder.create(vertx).handler(new HelloResource()).build();
+        vertx.createHttpServer().requestHandler(router::accept).listen(8081, server -> {
+            if (server.failed()) {
+                ctx.fail(server.cause());
+                return;
+            }
+
+            HttpClient httpClient = vertx.createHttpClient();
+            httpClient.get(8081, "localhost", "/hello/g/vert.x").exceptionHandler(ctx::fail).handler(res -> {
+                ctx.assertEquals(200, res.statusCode());
+                res.bodyHandler(buff -> {
+                    ctx.assertEquals("hello vert.x", buff.toJsonObject().getString("message"));
+
+                    server.result().close(v -> {
+                        if (v.failed()) {
+                            ctx.fail(v.cause());
+                            return;
+                        }
+                        async.complete();
+                    });
+                });
+            }).end();
+        });
+
+        async.await();
+    }
+
 }
