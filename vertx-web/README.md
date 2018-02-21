@@ -8,8 +8,8 @@ define a web service interface:
 @Path("/hello")
 public static class HelloResource {
 
-    @Get("/g")
-    public void get(RoutingContext ctx) {
+    @Get
+    public void g(RoutingContext ctx) {
     		ctx.response().end("Hello ws!");
     }
     
@@ -26,8 +26,8 @@ public static class HelloResource {
     }
     
     @Post("/p")
-    @Produces({ "text/plain" })
-    @Consumes({ "text/json" })
+    @Produces("text/plain")
+    @Consumes("text/json")
     public void post(RoutingContext ctx) {
         ctx.request().bodyHandler(rs -> {
         	String content = rs.toJsonObject().getString("content");

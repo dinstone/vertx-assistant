@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016~2017 dinstone<dinstone@163.com>
+ * Copyright (C) 2016~2018 dinstone<dinstone@163.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.dinstone.vertx.web.annotation;
 
 import org.junit.Test;
@@ -79,22 +78,22 @@ public class AnnotationHandlerTest {
 
             HttpClient httpClient = vertx.createHttpClient();
             httpClient.post(8081, "localhost", "/hello/p").putHeader("Content-Type", "text/json")
-                .exceptionHandler(ctx::fail).handler(res -> {
-                    ctx.assertEquals(200, res.statusCode());
-                    ctx.assertEquals("text/plain", res.getHeader("Content-Type"));
+                    .exceptionHandler(ctx::fail).handler(res -> {
+                        ctx.assertEquals(200, res.statusCode());
+                        ctx.assertEquals("text/plain", res.getHeader("Content-Type"));
 
-                    res.bodyHandler(buff -> {
-                        ctx.assertEquals("Hello ws!", buff.toString());
+                        res.bodyHandler(buff -> {
+                            ctx.assertEquals("Hello ws!", buff.toString());
 
-                        server.result().close(v -> {
-                            if (v.failed()) {
-                                ctx.fail(v.cause());
-                                return;
-                            }
-                            async.complete();
+                            server.result().close(v -> {
+                                if (v.failed()) {
+                                    ctx.fail(v.cause());
+                                    return;
+                                }
+                                async.complete();
+                            });
                         });
-                    });
-                }).end(new JsonObject().put("content", "ws").toString());
+                    }).end(new JsonObject().put("content", "ws").toString());
         });
 
         async.await();

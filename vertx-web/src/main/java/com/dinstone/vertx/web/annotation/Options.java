@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016~2017 dinstone<dinstone@163.com>
+ * Copyright (C) 2016~2018 dinstone<dinstone@163.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -23,5 +23,5 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 @Target({ ElementType.METHOD })
 public @interface Options {
-	String value();
+    String value() default "";
 }

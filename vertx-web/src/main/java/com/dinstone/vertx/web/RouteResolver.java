@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016~2017 dinstone<dinstone@163.com>
+ * Copyright (C) 2016~2018 dinstone<dinstone@163.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,6 @@ import io.vertx.ext.web.Router;
 
 public interface RouteResolver {
 
-	void process(Router router, Object instance, Class<?> clazz, Method method);
+    void process(Router router, Object instance, Class<?> clazz, Method method);
 
 }
