@@ -19,7 +19,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dinstone.vertx.web.annotation.handler.AnnotationRouteResolver;
+import com.dinstone.vertx.web.resolver.AnnotationRouteResolver;
 
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;

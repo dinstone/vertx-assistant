@@ -1,0 +1,11 @@
+vertx:
+  blockedThreadCheckInterval: 10000000
+  cluster:
+    type: zookeeper
+    zookeeper:
+      hosts: localhost
+      rootPath: vertx/cluster
+      retry:
+        initialSleepTime: 3000
+        maxTimes: 3
+      

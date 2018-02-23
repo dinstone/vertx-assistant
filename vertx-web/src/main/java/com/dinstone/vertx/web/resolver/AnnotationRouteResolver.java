@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dinstone.vertx.web.annotation.handler;
+package com.dinstone.vertx.web.resolver;
 
 import java.lang.annotation.Annotation;
 import java.lang.invoke.CallSite;

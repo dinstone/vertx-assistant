@@ -1,0 +1,3 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.dinstone.vertx.starter.config.VertxAutoConfiguration,\
+com.dinstone.vertx.starter.config.VertxRestAutoConfiguration

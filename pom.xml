@@ -207,6 +207,7 @@
 
 	<modules>
 		<module>vertx-web</module>
+		<module>vertx-starter</module>
 	</modules>
 
 </project>
