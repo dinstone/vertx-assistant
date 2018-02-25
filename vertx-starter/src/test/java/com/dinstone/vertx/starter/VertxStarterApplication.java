@@ -19,8 +19,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
-import com.dinstone.vertx.starter.config.EnableVertxRest;
-
 @SpringBootApplication
 @EnableVertxRest
 public class VertxStarterApplication {

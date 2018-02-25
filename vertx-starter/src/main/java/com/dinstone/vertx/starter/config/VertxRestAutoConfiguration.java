@@ -16,7 +16,7 @@
 package com.dinstone.vertx.starter.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.ComponentScan;
@@ -31,7 +31,7 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 
 @Configuration
-@ConditionalOnClass(EnableVertxRest.class)
+@ConditionalOnBean(VertxRestConfiguration.Marker.class)
 @EnableConfigurationProperties(VertxRestProperties.class)
 @ComponentScan("com.dinstone.vertx.starter.verticle")
 public class VertxRestAutoConfiguration {

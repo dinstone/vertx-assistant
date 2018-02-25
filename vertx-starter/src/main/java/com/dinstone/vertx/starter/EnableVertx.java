@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dinstone.vertx.starter.config;
+package com.dinstone.vertx.starter;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -22,8 +22,10 @@ import java.lang.annotation.Target;
 
 import org.springframework.context.annotation.Import;
 
+import com.dinstone.vertx.starter.config.VertxConfiguration;
+
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-@Import(VertxAutoConfiguration.class)
+@Import(VertxConfiguration.class)
 public @interface EnableVertx {
 }
