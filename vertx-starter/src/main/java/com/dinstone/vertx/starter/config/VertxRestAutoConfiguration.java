@@ -13,14 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.starter.config;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import org.springframework.context.event.EventListener;
 
 import com.dinstone.vertx.starter.VertxHelper;
@@ -33,7 +36,6 @@ import io.vertx.core.Vertx;
 @Configuration
 @ConditionalOnBean(VertxRestConfiguration.Marker.class)
 @EnableConfigurationProperties(VertxRestProperties.class)
-@ComponentScan("com.dinstone.vertx.starter.verticle")
 public class VertxRestAutoConfiguration {
 
     @Autowired
@@ -46,11 +48,27 @@ public class VertxRestAutoConfiguration {
     private SpringVerticleFactory verticleFactory;
 
     @EventListener
-    void deployVerticles(ApplicationReadyEvent event) throws Exception {
+    public void deployVerticles(ApplicationReadyEvent event) throws Exception {
         DeploymentOptions deployOptions = new DeploymentOptions();
         deployOptions.setInstances(restProperties.getInstances());
         String verticleName = verticleFactory.verticleName(HttpRestVerticle.class);
         VertxHelper.deployVerticle(vertx, deployOptions, verticleFactory, verticleName);
+    }
+
+    @Bean
+    @Scope("prototype")
+    public HttpRestVerticle restVerticle(ApplicationContext applicationContext) {
+        HttpRestVerticle restVerticle = new HttpRestVerticle();
+        restVerticle.setApplicationContext(applicationContext);
+        restVerticle.setRestProperties(restProperties);
+        return restVerticle;
+    }
+
+    @Bean
+    public SpringVerticleFactory verticleFactory(ApplicationContext applicationContext) {
+        SpringVerticleFactory verticleFactory = new SpringVerticleFactory();
+        verticleFactory.setApplicationContext(applicationContext);
+        return verticleFactory;
     }
 
 }

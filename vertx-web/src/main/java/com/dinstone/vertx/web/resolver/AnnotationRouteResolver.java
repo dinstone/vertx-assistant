@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.web.resolver;
 
 import java.lang.annotation.Annotation;
@@ -45,13 +46,6 @@ public class AnnotationRouteResolver implements RouteResolver {
 
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
 
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
-     * com.dinstone.vertx.web.annotation.AnnotationHandler#process(io.vertx.ext.
-     * web.Router, java.lang.Object, java.lang.Class, java.lang.reflect.Method)
-     */
     @Override
     public void process(final Router router, final Object instance, final Class<?> clazz, final Method method) {
         String servicePath = getServicePath(clazz);

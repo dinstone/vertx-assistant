@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dinstone.vertx.starter;
+package com.dinstone.example;
 
 import com.dinstone.vertx.web.annotation.Consumes;
 import com.dinstone.vertx.web.annotation.Get;

@@ -13,14 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.starter.verticle;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Scope;
-import org.springframework.stereotype.Component;
 
 import com.dinstone.vertx.starter.config.VertxRestProperties;
 import com.dinstone.vertx.web.RouterBuilder;
@@ -36,16 +34,12 @@ import io.vertx.ext.web.handler.ErrorHandler;
 import io.vertx.ext.web.handler.LoggerHandler;
 import io.vertx.ext.web.handler.TimeoutHandler;
 
-@Component
-@Scope("prototype")
 public class HttpRestVerticle extends AbstractVerticle {
 
     private static final Logger LOG = LoggerFactory.getLogger(HttpRestVerticle.class);
 
-    @Autowired
     private VertxRestProperties restProperties;
 
-    @Autowired
     private ApplicationContext applicationContext;
 
     @Override
@@ -78,6 +72,10 @@ public class HttpRestVerticle extends AbstractVerticle {
                 startFuture.fail(ar.cause());
             }
         });
+    }
+
+    public void setRestProperties(VertxRestProperties restProperties) {
+        this.restProperties = restProperties;
     }
 
     public void setApplicationContext(ApplicationContext applicationContext) {

@@ -13,21 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.starter.verticle;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
-import org.springframework.stereotype.Component;
 
 import io.vertx.core.Verticle;
 import io.vertx.core.spi.VerticleFactory;
 
-@Component
 public class SpringVerticleFactory implements VerticleFactory {
 
     private String prefix = "bean";
 
-    @Autowired
     private ApplicationContext applicationContext;
 
     @Override
@@ -54,7 +51,12 @@ public class SpringVerticleFactory implements VerticleFactory {
         return prefix() + ":" + verticleClass.getName();
     }
 
+    public void setPrefix(String prefix) {
+        this.prefix = prefix;
+    }
+
     public void setApplicationContext(ApplicationContext applicationContext) {
         this.applicationContext = applicationContext;
     }
+
 }
