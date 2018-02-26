@@ -23,6 +23,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import io.vertx.core.Vertx;
@@ -34,13 +35,26 @@ import io.vertx.core.VertxOptions;
 public class VertxAutoConfiguration {
 
     @Autowired
+    private ApplicationContext applicationContext;
+
+    @Autowired
     private VertxProperties vertxProperties;
 
     private Vertx vertx;
 
     @PostConstruct
     public void init() {
-        vertx = Vertx.vertx(loadVertxOptions());
+        VertxOptions vertxOptions = null;
+        try {
+            vertxOptions = applicationContext.getBean(VertxOptions.class);
+        } catch (Exception e) {
+            // ignore
+        }
+
+        if (vertxOptions == null) {
+            vertxOptions = loadVertxOptions();
+        }
+        vertx = Vertx.vertx(vertxOptions);
     }
 
     private VertxOptions loadVertxOptions() {
@@ -50,26 +64,9 @@ public class VertxAutoConfiguration {
             vertxOptions.setBlockedThreadCheckInterval(blockedCheckInterval);
         }
 
-//        String clusterType = vertxProperties.getClusterType();
-//        if(clusterType!=null&&clusterType.) {
-//            
-//        }
-
-        // JsonObject config = vertxConfig.getJsonObject("vertx.cluster");
-        // if (config != null && config.getString("type") != null) {
-        // ClusterManager clusterManager = null;
-        //
-        // String type = config.getString("type");
-        // if ("zookeeper".equalsIgnoreCase(type)) {
-        // clusterManager = new ZookeeperClusterManager(config);
-        // }
-        //
-        // if (clusterManager != null) {
-        // vertxOptions.setClustered(true).setClusterManager(clusterManager);
-        // } else {
-        // LOG.warn("unkown cluster type [{}]", type);
-        // }
-        // }
+        if (vertxProperties.getEventLoopPoolSize() > 0) {
+            vertxOptions.setEventLoopPoolSize(vertxProperties.getEventLoopPoolSize());
+        }
 
         return vertxOptions;
     }
