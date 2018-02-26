@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.starter.config;
 
 import javax.annotation.PostConstruct;
@@ -48,6 +49,11 @@ public class VertxAutoConfiguration {
         if (blockedCheckInterval > 0) {
             vertxOptions.setBlockedThreadCheckInterval(blockedCheckInterval);
         }
+
+//        String clusterType = vertxProperties.getClusterType();
+//        if(clusterType!=null&&clusterType.) {
+//            
+//        }
 
         // JsonObject config = vertxConfig.getJsonObject("vertx.cluster");
         // if (config != null && config.getString("type") != null) {

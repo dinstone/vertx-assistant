@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.example;
+
+import org.springframework.stereotype.Component;
 
 import com.dinstone.vertx.web.annotation.Consumes;
 import com.dinstone.vertx.web.annotation.Get;
@@ -25,6 +28,7 @@ import com.dinstone.vertx.web.annotation.Produces;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
+@Component
 @Handler
 @Path("/hello")
 public class HelloResource {
