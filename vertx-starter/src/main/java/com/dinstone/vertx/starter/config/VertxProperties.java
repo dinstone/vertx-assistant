@@ -25,7 +25,7 @@ public class VertxProperties {
 
     private int eventLoopPoolSize;
 
-    private String clusterType;
+    private int workerPoolSize;
 
     public int getBlockedThreadCheckInterval() {
         return blockedThreadCheckInterval;
@@ -35,20 +35,20 @@ public class VertxProperties {
         this.blockedThreadCheckInterval = blockedThreadCheckInterval;
     }
 
-    public String getClusterType() {
-        return clusterType;
-    }
-
-    public void setClusterType(String clusterType) {
-        this.clusterType = clusterType;
-    }
-
     public int getEventLoopPoolSize() {
         return eventLoopPoolSize;
     }
 
     public void setEventLoopPoolSize(int eventLoopPoolSize) {
         this.eventLoopPoolSize = eventLoopPoolSize;
+    }
+
+    public int getWorkerPoolSize() {
+        return workerPoolSize;
+    }
+
+    public void setWorkerPoolSize(int workerPoolSize) {
+        this.workerPoolSize = workerPoolSize;
     }
 
 }

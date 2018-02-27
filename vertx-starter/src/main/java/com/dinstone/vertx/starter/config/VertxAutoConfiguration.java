@@ -68,6 +68,10 @@ public class VertxAutoConfiguration {
             vertxOptions.setEventLoopPoolSize(vertxProperties.getEventLoopPoolSize());
         }
 
+        if (vertxProperties.getWorkerPoolSize() > 0) {
+            vertxOptions.setWorkerPoolSize(vertxProperties.getWorkerPoolSize());
+        }
+
         return vertxOptions;
     }
 

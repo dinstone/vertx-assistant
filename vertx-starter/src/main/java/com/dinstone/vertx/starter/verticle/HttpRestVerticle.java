@@ -50,28 +50,45 @@ public class HttpRestVerticle extends AbstractVerticle {
         mainRouter.route().handler(LoggerHandler.create());
         mainRouter.route().handler(BodyHandler.create());
         mainRouter.route().handler(CookieHandler.create());
-        mainRouter.route().handler(TimeoutHandler.create(restProperties.getTimeout()));
+        long timeout = restProperties.getTimeout();
+        if (timeout > 0) {
+            mainRouter.route().handler(TimeoutHandler.create(timeout));
+        }
 
+        // create router and build rest handler
         RouterBuilder routerBuilder = RouterBuilder.create(vertx);
         applicationContext.getBeansWithAnnotation(Handler.class).forEach((k, v) -> {
-            LOG.debug("build rest resource for {}", v.getClass());
+            LOG.debug("bind rest handler {}", v.getClass());
             routerBuilder.handler(v);
         });
-        mainRouter.mountSubRouter(restProperties.getContext(), routerBuilder.build());
+        mainRouter.mountSubRouter(getContextPath(), routerBuilder.build());
 
-        // http server
         int port = restProperties.getPort();
         String host = restProperties.getHost() == null ? "0.0.0.0" : restProperties.getHost();
-        HttpServerOptions serverOptions = new HttpServerOptions().setIdleTimeout(180);
+        HttpServerOptions serverOptions = new HttpServerOptions().setIdleTimeout(restProperties.getIdleTimeout());
         vertx.createHttpServer(serverOptions).requestHandler(mainRouter::accept).listen(port, host, ar -> {
             if (ar.succeeded()) {
-                LOG.info("start http rest success, on {}:{}", host, port);
+                LOG.info("start http rest success on {}:{}", host, port);
                 startFuture.complete();
             } else {
-                LOG.error("start http rest failed, on {}:{}", host, port);
+                LOG.error("start http rest failed on {}:{}", host, port);
                 startFuture.fail(ar.cause());
             }
         });
+    }
+
+    private String getContextPath() {
+        String contextPath = restProperties.getContextPath();
+        if (contextPath == null || contextPath.isEmpty()) {
+            contextPath = "/";
+        } else {
+            contextPath.trim();
+        }
+
+        if (!contextPath.startsWith("/")) {
+            contextPath = "/" + contextPath;
+        }
+        return contextPath;
     }
 
     public void setRestProperties(VertxRestProperties restProperties) {

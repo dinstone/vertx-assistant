@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.starter.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -24,9 +25,11 @@ public class VertxRestProperties {
 
     private int port = 8080;
 
-    private long timeout = 1000;
+    private long timeout = 3000;
 
-    private String context = "/";
+    private int idleTimeout = 180;
+
+    private String contextPath = "/";
 
     private int instances = Runtime.getRuntime().availableProcessors();
 
@@ -54,12 +57,12 @@ public class VertxRestProperties {
         this.timeout = timeout;
     }
 
-    public String getContext() {
-        return context;
+    public String getContextPath() {
+        return contextPath;
     }
 
-    public void setContext(String context) {
-        this.context = context;
+    public void setContextPath(String contextPath) {
+        this.contextPath = contextPath;
     }
 
     public int getInstances() {
@@ -68,6 +71,17 @@ public class VertxRestProperties {
 
     public void setInstances(int instances) {
         this.instances = instances;
+    }
+
+    public int getIdleTimeout() {
+        if (idleTimeout > 0) {
+            return idleTimeout;
+        }
+        return 180;
+    }
+
+    public void setIdleTimeout(int idleTimeout) {
+        this.idleTimeout = idleTimeout;
     }
 
 }

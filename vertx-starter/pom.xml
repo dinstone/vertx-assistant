@@ -8,7 +8,7 @@
 	<packaging>jar</packaging>
 
 	<name>vertx-spring-boot-starter</name>
-	<description>vertx starter project for Spring Boot</description>
+	<description>vertx starter project for spring boot</description>
 
 	<parent>
 		<groupId>com.dinstone.vertx</groupId>
@@ -23,6 +23,11 @@
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-configuration-processor</artifactId>
+			<optional>true</optional>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot</artifactId>
