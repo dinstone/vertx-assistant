@@ -20,16 +20,16 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Configurable;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.VertxOptions;
 
-@Configurable
+@Configuration
 @ConditionalOnBean(VertxConfiguration.Marker.class)
 @EnableConfigurationProperties(VertxProperties.class)
 public class VertxAutoConfiguration {

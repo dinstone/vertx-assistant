@@ -10,7 +10,7 @@ vertx-web maven description :
 <dependency>
     <groupId>com.dinstone.vertx</groupId>
     <artifactId>vertx-web-assistant</artifactId>
-    <version>2.1.0</version>
+    <version>2.2.0</version>
 </dependency>
 ```
 
