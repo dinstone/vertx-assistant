@@ -23,6 +23,7 @@ import org.springframework.context.ApplicationContext;
 import com.dinstone.vertx.starter.config.VertxRestProperties;
 import com.dinstone.vertx.web.RouterBuilder;
 import com.dinstone.vertx.web.annotation.Handler;
+import com.dinstone.vertx.web.annotation.Interceptor;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
@@ -57,6 +58,10 @@ public class HttpRestVerticle extends AbstractVerticle {
 
         // create router and build rest handler
         RouterBuilder routerBuilder = RouterBuilder.create(vertx);
+        applicationContext.getBeansWithAnnotation(Interceptor.class).forEach((k, v) -> {
+            LOG.debug("bind rest interceptor {}", v.getClass());
+            routerBuilder.handler(v);
+        });
         applicationContext.getBeansWithAnnotation(Handler.class).forEach((k, v) -> {
             LOG.debug("bind rest handler {}", v.getClass());
             routerBuilder.handler(v);
@@ -65,7 +70,7 @@ public class HttpRestVerticle extends AbstractVerticle {
 
         int port = restProperties.getPort();
         String host = restProperties.getHost() == null ? "0.0.0.0" : restProperties.getHost();
-        HttpServerOptions serverOptions = new HttpServerOptions().setIdleTimeout(restProperties.getIdleTimeout());
+        HttpServerOptions serverOptions = getRestHttpServerOptions();
         vertx.createHttpServer(serverOptions).requestHandler(mainRouter::accept).listen(port, host, ar -> {
             if (ar.succeeded()) {
                 LOG.info("start http rest success on {}:{}", host, port);
@@ -75,6 +80,19 @@ public class HttpRestVerticle extends AbstractVerticle {
                 startFuture.fail(ar.cause());
             }
         });
+    }
+
+    private HttpServerOptions getRestHttpServerOptions() {
+        HttpServerOptions serverOptions = null;
+        try {
+            serverOptions = applicationContext.getBean("restHttpServerOptions", HttpServerOptions.class);
+        } catch (Exception e) {
+            // ignore
+        }
+        if (serverOptions == null) {
+            serverOptions = new HttpServerOptions().setIdleTimeout(restProperties.getIdleTimeout());
+        }
+        return serverOptions;
     }
 
     private String getContextPath() {
