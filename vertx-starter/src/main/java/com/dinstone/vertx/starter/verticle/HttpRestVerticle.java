@@ -49,8 +49,8 @@ public class HttpRestVerticle extends AbstractVerticle {
 
         mainRouter.route().failureHandler(ErrorHandler.create(false));
         mainRouter.route().handler(LoggerHandler.create());
-        mainRouter.route().handler(BodyHandler.create());
         mainRouter.route().handler(CookieHandler.create());
+        mainRouter.route().handler(BodyHandler.create());
         long timeout = restProperties.getTimeout();
         if (timeout > 0) {
             mainRouter.route().handler(TimeoutHandler.create(timeout));
@@ -68,15 +68,13 @@ public class HttpRestVerticle extends AbstractVerticle {
         });
         mainRouter.mountSubRouter(getContextPath(), routerBuilder.build());
 
-        int port = restProperties.getPort();
-        String host = restProperties.getHost() == null ? "0.0.0.0" : restProperties.getHost();
         HttpServerOptions serverOptions = getRestHttpServerOptions();
-        vertx.createHttpServer(serverOptions).requestHandler(mainRouter::accept).listen(port, host, ar -> {
+        vertx.createHttpServer(serverOptions).requestHandler(mainRouter::accept).listen(ar -> {
             if (ar.succeeded()) {
-                LOG.info("start http rest success on {}:{}", host, port);
+                LOG.info("start http rest success on {}:{}", serverOptions.getHost(), serverOptions.getPort());
                 startFuture.complete();
             } else {
-                LOG.error("start http rest failed on {}:{}", host, port);
+                LOG.error("start http rest failed on {}:{}", serverOptions.getHost(), serverOptions.getPort());
                 startFuture.fail(ar.cause());
             }
         });
@@ -90,7 +88,14 @@ public class HttpRestVerticle extends AbstractVerticle {
             // ignore
         }
         if (serverOptions == null) {
-            serverOptions = new HttpServerOptions().setIdleTimeout(restProperties.getIdleTimeout());
+            serverOptions = new HttpServerOptions();
+        }
+
+        serverOptions.setIdleTimeout(restProperties.getIdleTimeout());
+        serverOptions.setPort(restProperties.getPort());
+
+        if (restProperties.getHost() != null) {
+            serverOptions.setHost(restProperties.getHost());
         }
         return serverOptions;
     }
