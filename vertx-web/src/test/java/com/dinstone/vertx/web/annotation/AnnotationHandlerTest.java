@@ -20,6 +20,7 @@ import org.junit.runner.RunWith;
 
 import com.dinstone.vertx.web.RouterBuilder;
 import com.dinstone.vertx.web.resource.HelloResource;
+import com.dinstone.vertx.web.resource.HelloResourceSubclass;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
@@ -115,6 +116,37 @@ public class AnnotationHandlerTest {
                 ctx.assertEquals(200, res.statusCode());
                 res.bodyHandler(buff -> {
                     ctx.assertEquals("hello vert.x", buff.toJsonObject().getString("message"));
+
+                    server.result().close(v -> {
+                        if (v.failed()) {
+                            ctx.fail(v.cause());
+                            return;
+                        }
+                        async.complete();
+                    });
+                });
+            }).end();
+        });
+
+        async.await();
+    }
+    
+    @Test
+    public void testHelloResourceSubclassGet(TestContext ctx) {
+        final Async async = ctx.async();
+
+        final Router router = RouterBuilder.create(vertx).handler(new HelloResourceSubclass()).build();
+        vertx.createHttpServer().requestHandler(router::accept).listen(8081, server -> {
+            if (server.failed()) {
+                ctx.fail(server.cause());
+                return;
+            }
+
+            HttpClient httpClient = vertx.createHttpClient();
+            httpClient.get(8081, "localhost", "/hello/g").exceptionHandler(ctx::fail).handler(res -> {
+                ctx.assertEquals(200, res.statusCode());
+                res.bodyHandler(buff -> {
+                    ctx.assertEquals("Hello ws!", buff.toString());
 
                     server.result().close(v -> {
                         if (v.failed()) {

@@ -245,11 +245,6 @@ public class AnnotationRouteResolver implements RouteResolver {
         }
 
         Annotation[] annotations = m.getAnnotations();
-        // this method is not annotated
-        if (annotations == null) {
-            return null;
-        }
-
         // verify if the method is annotated
         for (Annotation ann : annotations) {
             if (ann.annotationType().equals(annotation)) {
@@ -257,29 +252,41 @@ public class AnnotationRouteResolver implements RouteResolver {
             }
         }
 
+        annotations = m.getDeclaredAnnotations();
+        // verify if the method is annotated
+        for (Annotation ann : annotations) {
+            if (ann.annotationType().equals(annotation)) {
+                return (T) ann;
+            }
+        }
         return null;
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Annotation> T getAnnotation(Class<?> c, Class<T> annotation) {
+    public static <T extends Annotation> T getAnnotation(Class<?> c, Class<T> annotationType) {
         // skip non public classes
         if (!Modifier.isPublic(c.getModifiers())) {
             return null;
         }
 
-        Annotation[] annotations = c.getAnnotations();
-        // this method is not annotated
-        if (annotations == null) {
-            return null;
-        }
-
-        // verify if the method is annotated
+        Annotation[] annotations = c.getDeclaredAnnotations();
         for (Annotation ann : annotations) {
-            if (ann.annotationType().equals(annotation)) {
+            if (ann.annotationType().equals(annotationType)) {
                 return (T) ann;
             }
         }
 
-        return null;
+        for (Class<?> ifc : c.getInterfaces()) {
+            T annotation = getAnnotation(ifc, annotationType);
+            if (annotation != null) {
+                return annotation;
+            }
+        }
+
+        Class<?> superclass = c.getSuperclass();
+        if (superclass == null || Object.class == superclass) {
+            return null;
+        }
+        return getAnnotation(superclass, annotationType);
     }
 }
