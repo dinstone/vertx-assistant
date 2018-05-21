@@ -234,32 +234,103 @@ public class AnnotationRouteResolver implements RouteResolver {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T extends Annotation> T getAnnotation(Method m, Class<T> annotation) {
+    public static <T extends Annotation> T getAnnotation(Method method, Class<T> annotationType) {
         // skip static methods
-        if (Modifier.isStatic(m.getModifiers())) {
+        if (Modifier.isStatic(method.getModifiers())) {
             return null;
         }
         // skip non public methods
-        if (!Modifier.isPublic(m.getModifiers())) {
+        if (!Modifier.isPublic(method.getModifiers())) {
             return null;
         }
 
-        Annotation[] annotations = m.getAnnotations();
-        // verify if the method is annotated
-        for (Annotation ann : annotations) {
-            if (ann.annotationType().equals(annotation)) {
-                return (T) ann;
-            }
+        if (annotationType == null) {
+            return null;
         }
 
-        annotations = m.getDeclaredAnnotations();
-        // verify if the method is annotated
-        for (Annotation ann : annotations) {
-            if (ann.annotationType().equals(annotation)) {
-                return (T) ann;
+        T result = null;
+        // AnnotationCacheKey cacheKey = new AnnotationCacheKey(method, annotationType);
+        // A result = (A) findAnnotationCache.get(cacheKey);
+
+        if (result == null) {
+            // Method resolvedMethod = BridgeMethodResolver.findBridgedMethod(method);
+            // result = findAnnotation((AnnotatedElement) resolvedMethod, annotationType);
+            Annotation[] annotations = method.getDeclaredAnnotations();
+            for (Annotation ann : annotations) {
+                if (ann.annotationType().equals(annotationType)) {
+                    result = (T) ann;
+                }
+            }
+
+            if (result == null) {
+                result = searchOnInterfaces(method, annotationType, method.getDeclaringClass().getInterfaces());
+            }
+
+            Class<?> clazz = method.getDeclaringClass();
+            while (result == null) {
+                clazz = clazz.getSuperclass();
+                if (clazz == null || Object.class == clazz) {
+                    break;
+                }
+                
+                try {
+                    Method equivalentMethod = clazz.getDeclaredMethod(method.getName(), method.getParameterTypes());
+                    // Method resolvedEquivalentMethod =
+                    // BridgeMethodResolver.findBridgedMethod(equivalentMethod);
+                    result = getAnnotation(equivalentMethod, annotationType);
+                } catch (NoSuchMethodException ex) {
+                    // No equivalent method found
+                }
+                if (result == null) {
+                    result = searchOnInterfaces(method, annotationType, clazz.getInterfaces());
+                }
+            }
+
+            // if (result != null) {
+            // result = synthesizeAnnotation(result, method);
+            // findAnnotationCache.put(cacheKey, result);
+            // }
+        }
+
+        return result;
+    }
+
+    private static <A extends Annotation> A searchOnInterfaces(Method method, Class<A> annotationType,
+            Class<?>... ifcs) {
+        A annotation = null;
+        for (Class<?> iface : ifcs) {
+            if (isInterfaceWithAnnotatedMethods(iface)) {
+                try {
+                    Method equivalentMethod = iface.getMethod(method.getName(), method.getParameterTypes());
+                    annotation = getAnnotation(equivalentMethod, annotationType);
+                } catch (NoSuchMethodException ex) {
+                    // Skip this interface - it doesn't have the method...
+                }
+                if (annotation != null) {
+                    break;
+                }
             }
         }
-        return null;
+        return annotation;
+    }
+
+    static boolean isInterfaceWithAnnotatedMethods(Class<?> iface) {
+        // Boolean found = annotatedInterfaceCache.get(iface);
+        // if (found != null) {
+        // return found;
+        // }
+        Boolean found = Boolean.FALSE;
+        for (Method ifcMethod : iface.getMethods()) {
+            try {
+                if (ifcMethod.getAnnotations().length > 0) {
+                    found = Boolean.TRUE;
+                    break;
+                }
+            } catch (Throwable ex) {
+            }
+        }
+        // annotatedInterfaceCache.put(iface, found);
+        return found;
     }
 
     @SuppressWarnings("unchecked")
