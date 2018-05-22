@@ -44,320 +44,298 @@ import io.vertx.ext.web.RoutingContext;
 
 public class AnnotationRouteResolver implements RouteResolver {
 
-    private static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
+	private static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
 
-    @Override
-    public void process(final Router router, final Object instance, final Class<?> clazz, final Method method) {
-        String servicePath = getServicePath(clazz);
-        if (isCompatible(method, Get.class, RoutingContext.class)) {
-            String methodPath = getAnnotation(method, Get.class).value();
-            String path = getRoutePath(servicePath, methodPath, method);
-            MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-            Route route = router.get(path).handler(wrap(instance, methodHandle));
-            andRouteBasedContentType(route, clazz, method);
-        }
-        if (isCompatible(method, Post.class, RoutingContext.class)) {
-            String methodPath = getAnnotation(method, Post.class).value();
-            String path = getRoutePath(servicePath, methodPath, method);
-            MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-            Route route = router.post(path).handler(wrap(instance, methodHandle));
-            andRouteBasedContentType(route, clazz, method);
-        }
-        if (isCompatible(method, Put.class, RoutingContext.class)) {
-            String methodPath = getAnnotation(method, Put.class).value();
-            String path = getRoutePath(servicePath, methodPath, method);
-            MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-            Route route = router.put(path).handler(wrap(instance, methodHandle));
-            andRouteBasedContentType(route, clazz, method);
-        }
-        if (isCompatible(method, Delete.class, RoutingContext.class)) {
-            String methodPath = getAnnotation(method, Delete.class).value();
-            String path = getRoutePath(servicePath, methodPath, method);
-            MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-            Route route = router.delete(path).handler(wrap(instance, methodHandle));
-            andRouteBasedContentType(route, clazz, method);
-        }
-        if (isCompatible(method, Connect.class, RoutingContext.class)) {
-            String methodPath = getAnnotation(method, Connect.class).value();
-            String path = getRoutePath(servicePath, methodPath, method);
-            MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-            Route route = router.connect(path).handler(wrap(instance, methodHandle));
-            andRouteBasedContentType(route, clazz, method);
-        }
-        if (isCompatible(method, Options.class, RoutingContext.class)) {
-            String methodPath = getAnnotation(method, Options.class).value();
-            String path = getRoutePath(servicePath, methodPath, method);
-            MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-            Route route = router.options(path).handler(wrap(instance, methodHandle));
-            andRouteBasedContentType(route, clazz, method);
-        }
-        if (isCompatible(method, Head.class, RoutingContext.class)) {
-            String methodPath = getAnnotation(method, Head.class).value();
-            String path = getRoutePath(servicePath, methodPath, method);
-            MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-            Route route = router.head(path).handler(wrap(instance, methodHandle));
-            andRouteBasedContentType(route, clazz, method);
-        }
-        if (isCompatible(method, Patch.class, RoutingContext.class)) {
-            String methodPath = getAnnotation(method, Patch.class).value();
-            String path = getRoutePath(servicePath, methodPath, method);
-            MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-            Route route = router.patch(path).handler(wrap(instance, methodHandle));
-            andRouteBasedContentType(route, clazz, method);
-        }
-        if (isCompatible(method, Path.class, RoutingContext.class)) {
-            String methodPath = getAnnotation(method, Path.class).value();
-            String path = getRoutePath(servicePath, methodPath, method);
-            MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
-            Route route = router.route(path).handler(wrap(instance, methodHandle));
-            andRouteBasedContentType(route, clazz, method);
-        }
-    }
+	@Override
+	public void process(final Router router, final Object instance, final Class<?> clazz, final Method method) {
+		String servicePath = getServicePath(clazz);
+		if (isCompatible(method, Get.class, RoutingContext.class)) {
+			String methodPath = getAnnotation(method, Get.class).value();
+			String path = getRoutePath(servicePath, methodPath, method);
+			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
+			Route route = router.get(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
+		}
+		if (isCompatible(method, Post.class, RoutingContext.class)) {
+			String methodPath = getAnnotation(method, Post.class).value();
+			String path = getRoutePath(servicePath, methodPath, method);
+			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
+			Route route = router.post(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
+		}
+		if (isCompatible(method, Put.class, RoutingContext.class)) {
+			String methodPath = getAnnotation(method, Put.class).value();
+			String path = getRoutePath(servicePath, methodPath, method);
+			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
+			Route route = router.put(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
+		}
+		if (isCompatible(method, Delete.class, RoutingContext.class)) {
+			String methodPath = getAnnotation(method, Delete.class).value();
+			String path = getRoutePath(servicePath, methodPath, method);
+			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
+			Route route = router.delete(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
+		}
+		if (isCompatible(method, Connect.class, RoutingContext.class)) {
+			String methodPath = getAnnotation(method, Connect.class).value();
+			String path = getRoutePath(servicePath, methodPath, method);
+			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
+			Route route = router.connect(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
+		}
+		if (isCompatible(method, Options.class, RoutingContext.class)) {
+			String methodPath = getAnnotation(method, Options.class).value();
+			String path = getRoutePath(servicePath, methodPath, method);
+			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
+			Route route = router.options(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
+		}
+		if (isCompatible(method, Head.class, RoutingContext.class)) {
+			String methodPath = getAnnotation(method, Head.class).value();
+			String path = getRoutePath(servicePath, methodPath, method);
+			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
+			Route route = router.head(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
+		}
+		if (isCompatible(method, Patch.class, RoutingContext.class)) {
+			String methodPath = getAnnotation(method, Patch.class).value();
+			String path = getRoutePath(servicePath, methodPath, method);
+			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
+			Route route = router.patch(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
+		}
+		if (isCompatible(method, Path.class, RoutingContext.class)) {
+			String methodPath = getAnnotation(method, Path.class).value();
+			String path = getRoutePath(servicePath, methodPath, method);
+			MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
+			Route route = router.route(path).handler(wrap(instance, methodHandle));
+			andRouteBasedContentType(route, clazz, method);
+		}
+	}
 
-    private static String getRoutePath(String servicePath, String methodPath, Method method) {
-        if ("".equals(methodPath)) {
-            return servicePath + "/" + method.getName();
-        }
+	private static String getRoutePath(String servicePath, String methodPath, Method method) {
+		if ("".equals(methodPath)) {
+			return servicePath + "/" + method.getName();
+		}
 
-        if (!methodPath.startsWith("/")) {
-            return servicePath + "/" + methodPath;
-        }
-        return servicePath + methodPath;
-    }
+		if (!methodPath.startsWith("/")) {
+			return servicePath + "/" + methodPath;
+		}
+		return servicePath + methodPath;
+	}
 
-    private static void andRouteBasedContentType(Route route, final Class<?> clazz, final Method method) {
-        if (route != null) {
-            String[] produces = getProduces(clazz, method);
-            String[] consumes = getConsumes(clazz, method);
-            if (produces != null) {
-                for (String contentType : produces) {
-                    route.produces(contentType);
-                }
-            }
+	private static void andRouteBasedContentType(Route route, final Class<?> clazz, final Method method) {
+		if (route != null) {
+			String[] produces = getProduces(clazz, method);
+			String[] consumes = getConsumes(clazz, method);
+			if (produces != null) {
+				for (String contentType : produces) {
+					route.produces(contentType);
+				}
+			}
 
-            if (consumes != null) {
-                for (String contentType : consumes) {
-                    route.consumes(contentType);
-                }
-            }
-        }
-    }
+			if (consumes != null) {
+				for (String contentType : consumes) {
+					route.consumes(contentType);
+				}
+			}
+		}
+	}
 
-    private static Handler<RoutingContext> wrap(final Object instance, final MethodHandle mh) {
-        return ctx -> {
-            try {
-                String acceptableContentType = ctx.getAcceptableContentType();
-                if (acceptableContentType != null) {
-                    ctx.response().putHeader("Content-Type", acceptableContentType);
-                }
+	private static Handler<RoutingContext> wrap(final Object instance, final MethodHandle mh) {
+		return ctx -> {
+			try {
+				String acceptableContentType = ctx.getAcceptableContentType();
+				if (acceptableContentType != null) {
+					ctx.response().putHeader("Content-Type", acceptableContentType);
+				}
 
-                mh.invoke(instance, ctx);
-            } catch (Throwable e) {
-                ctx.fail(e);
-            }
-        };
-    }
+				mh.invoke(instance, ctx);
+			} catch (Throwable e) {
+				ctx.fail(e);
+			}
+		};
+	}
 
-    private static String[] getConsumes(final Class<?> clazz, final Method method) {
-        String[] consumes = null;
-        Consumes defaultSetting = getAnnotation(clazz, Consumes.class);
-        if (defaultSetting != null) {
-            consumes = defaultSetting.value();
-        }
+	private static String[] getConsumes(final Class<?> clazz, final Method method) {
+		String[] consumes = null;
+		Consumes defaultSetting = getAnnotation(clazz, Consumes.class);
+		if (defaultSetting != null) {
+			consumes = defaultSetting.value();
+		}
 
-        Consumes apiSetting = getAnnotation(method, Consumes.class);
-        if (apiSetting != null) {
-            consumes = apiSetting.value();
-        }
-        return consumes;
-    }
+		Consumes apiSetting = getAnnotation(method, Consumes.class);
+		if (apiSetting != null) {
+			consumes = apiSetting.value();
+		}
+		return consumes;
+	}
 
-    private static String[] getProduces(final Class<?> clazz, final Method method) {
-        String[] produces = null;
-        Produces defaultSetting = getAnnotation(clazz, Produces.class);
-        if (defaultSetting != null) {
-            produces = defaultSetting.value();
-        }
+	private static String[] getProduces(final Class<?> clazz, final Method method) {
+		String[] produces = null;
+		Produces defaultSetting = getAnnotation(clazz, Produces.class);
+		if (defaultSetting != null) {
+			produces = defaultSetting.value();
+		}
 
-        Produces apiSetting = getAnnotation(method, Produces.class);
-        if (apiSetting != null) {
-            produces = apiSetting.value();
-        }
-        return produces;
-    }
+		Produces apiSetting = getAnnotation(method, Produces.class);
+		if (apiSetting != null) {
+			produces = apiSetting.value();
+		}
+		return produces;
+	}
 
-    private static String getServicePath(final Class<?> clazz) {
-        Path routePath = getAnnotation(clazz, Path.class);
-        return routePath == null ? "" : routePath.value();
-    }
+	private static String getServicePath(final Class<?> clazz) {
+		Path routePath = getAnnotation(clazz, Path.class);
+		return routePath == null ? "" : routePath.value();
+	}
 
-    public static MethodHandle getMethodHandle(Method m, Class<?>... paramTypes) {
-        try {
-            Class<?>[] methodParamTypes = m.getParameterTypes();
+	public static MethodHandle getMethodHandle(Method m, Class<?>... paramTypes) {
+		try {
+			Class<?>[] methodParamTypes = m.getParameterTypes();
 
-            if (methodParamTypes != null) {
-                if (methodParamTypes.length == paramTypes.length) {
-                    for (int i = 0; i < methodParamTypes.length; i++) {
-                        if (!paramTypes[i].isAssignableFrom(methodParamTypes[i])) {
-                            // for groovy and other languages that do not do
-                            // type check at compile time
-                            if (!methodParamTypes[i].equals(Object.class)) {
-                                return null;
-                            }
-                        }
-                    }
-                } else {
-                    return null;
-                }
-            } else {
-                return null;
-            }
+			if (methodParamTypes != null) {
+				if (methodParamTypes.length == paramTypes.length) {
+					for (int i = 0; i < methodParamTypes.length; i++) {
+						if (!paramTypes[i].isAssignableFrom(methodParamTypes[i])) {
+							// for groovy and other languages that do not do
+							// type check at compile time
+							if (!methodParamTypes[i].equals(Object.class)) {
+								return null;
+							}
+						}
+					}
+				} else {
+					return null;
+				}
+			} else {
+				return null;
+			}
 
-            MethodHandle methodHandle = LOOKUP.unreflect(m);
-            CallSite callSite = new ConstantCallSite(methodHandle);
-            return callSite.dynamicInvoker();
+			MethodHandle methodHandle = LOOKUP.unreflect(m);
+			CallSite callSite = new ConstantCallSite(methodHandle);
+			return callSite.dynamicInvoker();
 
-        } catch (IllegalAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
-    public static boolean isCompatible(Method m, Class<? extends Annotation> annotation, Class<?>... paramTypes) {
-        if (getAnnotation(m, annotation) != null) {
-            if (getMethodHandle(m, paramTypes) != null) {
-                return true;
-            } else {
-                throw new RuntimeException("Method signature not compatible!");
-            }
-        }
-        return false;
-    }
+	public static boolean isCompatible(Method m, Class<? extends Annotation> annotation, Class<?>... paramTypes) {
+		if (getAnnotation(m, annotation) != null) {
+			if (getMethodHandle(m, paramTypes) != null) {
+				return true;
+			} else {
+				throw new RuntimeException("Method signature not compatible!");
+			}
+		}
+		return false;
+	}
 
-    @SuppressWarnings("unchecked")
-    public static <T extends Annotation> T getAnnotation(Method method, Class<T> annotationType) {
-        // skip static methods
-        if (Modifier.isStatic(method.getModifiers())) {
-            return null;
-        }
-        // skip non public methods
-        if (!Modifier.isPublic(method.getModifiers())) {
-            return null;
-        }
+	@SuppressWarnings("unchecked")
+	public static <T extends Annotation> T getAnnotation(Method method, Class<T> annotationType) {
+		// skip static methods
+		if (Modifier.isStatic(method.getModifiers())) {
+			return null;
+		}
+		// skip non public methods
+		if (!Modifier.isPublic(method.getModifiers())) {
+			return null;
+		}
 
-        if (annotationType == null) {
-            return null;
-        }
+		if (annotationType == null) {
+			return null;
+		}
 
-        T result = null;
-        // AnnotationCacheKey cacheKey = new AnnotationCacheKey(method, annotationType);
-        // A result = (A) findAnnotationCache.get(cacheKey);
+		Annotation[] annotations = method.getDeclaredAnnotations();
+		for (Annotation ann : annotations) {
+			if (ann.annotationType().equals(annotationType)) {
+				return (T) ann;
+			}
+		}
 
-        if (result == null) {
-            // Method resolvedMethod = BridgeMethodResolver.findBridgedMethod(method);
-            // result = findAnnotation((AnnotatedElement) resolvedMethod, annotationType);
-            Annotation[] annotations = method.getDeclaredAnnotations();
-            for (Annotation ann : annotations) {
-                if (ann.annotationType().equals(annotationType)) {
-                    result = (T) ann;
-                }
-            }
+		Class<?> clazz = method.getDeclaringClass();
+		T result = searchOnInterfaces(method, annotationType, clazz.getInterfaces());
 
-            if (result == null) {
-                result = searchOnInterfaces(method, annotationType, method.getDeclaringClass().getInterfaces());
-            }
+		while (result == null) {
+			clazz = clazz.getSuperclass();
+			if (clazz == null || Object.class == clazz) {
+				break;
+			}
 
-            Class<?> clazz = method.getDeclaringClass();
-            while (result == null) {
-                clazz = clazz.getSuperclass();
-                if (clazz == null || Object.class == clazz) {
-                    break;
-                }
-                
-                try {
-                    Method equivalentMethod = clazz.getDeclaredMethod(method.getName(), method.getParameterTypes());
-                    // Method resolvedEquivalentMethod =
-                    // BridgeMethodResolver.findBridgedMethod(equivalentMethod);
-                    result = getAnnotation(equivalentMethod, annotationType);
-                } catch (NoSuchMethodException ex) {
-                    // No equivalent method found
-                }
-                if (result == null) {
-                    result = searchOnInterfaces(method, annotationType, clazz.getInterfaces());
-                }
-            }
+			try {
+				Method equivalentMethod = clazz.getDeclaredMethod(method.getName(), method.getParameterTypes());
+				result = getAnnotation(equivalentMethod, annotationType);
+			} catch (NoSuchMethodException ex) {
+				// No equivalent method found
+			}
+			if (result == null) {
+				result = searchOnInterfaces(method, annotationType, clazz.getInterfaces());
+			}
+		}
 
-            // if (result != null) {
-            // result = synthesizeAnnotation(result, method);
-            // findAnnotationCache.put(cacheKey, result);
-            // }
-        }
+		return result;
+	}
 
-        return result;
-    }
+	private static <A extends Annotation> A searchOnInterfaces(Method method, Class<A> annotationType,
+			Class<?>... ifcs) {
+		A annotation = null;
+		for (Class<?> iface : ifcs) {
+			if (isInterfaceWithAnnotatedMethods(iface)) {
+				try {
+					Method equivalentMethod = iface.getMethod(method.getName(), method.getParameterTypes());
+					annotation = getAnnotation(equivalentMethod, annotationType);
+				} catch (NoSuchMethodException ex) {
+					// Skip this interface - it doesn't have the method...
+				}
+				if (annotation != null) {
+					break;
+				}
+			}
+		}
+		return annotation;
+	}
 
-    private static <A extends Annotation> A searchOnInterfaces(Method method, Class<A> annotationType,
-            Class<?>... ifcs) {
-        A annotation = null;
-        for (Class<?> iface : ifcs) {
-            if (isInterfaceWithAnnotatedMethods(iface)) {
-                try {
-                    Method equivalentMethod = iface.getMethod(method.getName(), method.getParameterTypes());
-                    annotation = getAnnotation(equivalentMethod, annotationType);
-                } catch (NoSuchMethodException ex) {
-                    // Skip this interface - it doesn't have the method...
-                }
-                if (annotation != null) {
-                    break;
-                }
-            }
-        }
-        return annotation;
-    }
+	static boolean isInterfaceWithAnnotatedMethods(Class<?> iface) {
+		Boolean found = Boolean.FALSE;
+		for (Method ifcMethod : iface.getMethods()) {
+			try {
+				if (ifcMethod.getAnnotations().length > 0) {
+					found = Boolean.TRUE;
+					break;
+				}
+			} catch (Throwable ex) {
+			}
+		}
+		return found;
+	}
 
-    static boolean isInterfaceWithAnnotatedMethods(Class<?> iface) {
-        // Boolean found = annotatedInterfaceCache.get(iface);
-        // if (found != null) {
-        // return found;
-        // }
-        Boolean found = Boolean.FALSE;
-        for (Method ifcMethod : iface.getMethods()) {
-            try {
-                if (ifcMethod.getAnnotations().length > 0) {
-                    found = Boolean.TRUE;
-                    break;
-                }
-            } catch (Throwable ex) {
-            }
-        }
-        // annotatedInterfaceCache.put(iface, found);
-        return found;
-    }
+	@SuppressWarnings("unchecked")
+	public static <T extends Annotation> T getAnnotation(Class<?> c, Class<T> annotationType) {
+		// skip non public classes
+		if (!Modifier.isPublic(c.getModifiers())) {
+			return null;
+		}
 
-    @SuppressWarnings("unchecked")
-    public static <T extends Annotation> T getAnnotation(Class<?> c, Class<T> annotationType) {
-        // skip non public classes
-        if (!Modifier.isPublic(c.getModifiers())) {
-            return null;
-        }
+		Annotation[] annotations = c.getDeclaredAnnotations();
+		for (Annotation ann : annotations) {
+			if (ann.annotationType().equals(annotationType)) {
+				return (T) ann;
+			}
+		}
 
-        Annotation[] annotations = c.getDeclaredAnnotations();
-        for (Annotation ann : annotations) {
-            if (ann.annotationType().equals(annotationType)) {
-                return (T) ann;
-            }
-        }
+		for (Class<?> ifc : c.getInterfaces()) {
+			T annotation = getAnnotation(ifc, annotationType);
+			if (annotation != null) {
+				return annotation;
+			}
+		}
 
-        for (Class<?> ifc : c.getInterfaces()) {
-            T annotation = getAnnotation(ifc, annotationType);
-            if (annotation != null) {
-                return annotation;
-            }
-        }
-
-        Class<?> superclass = c.getSuperclass();
-        if (superclass == null || Object.class == superclass) {
-            return null;
-        }
-        return getAnnotation(superclass, annotationType);
-    }
+		Class<?> superclass = c.getSuperclass();
+		if (superclass == null || Object.class == superclass) {
+			return null;
+		}
+		return getAnnotation(superclass, annotationType);
+	}
 }
