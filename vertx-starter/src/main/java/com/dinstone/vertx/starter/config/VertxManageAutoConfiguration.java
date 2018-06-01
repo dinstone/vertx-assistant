@@ -34,41 +34,41 @@ import io.vertx.core.DeploymentOptions;
 import io.vertx.core.Vertx;
 
 @Configuration
-@ConditionalOnBean(VertxRestConfiguration.Marker.class)
-@EnableConfigurationProperties(VertxRestProperties.class)
-public class VertxRestAutoConfiguration {
+@ConditionalOnBean(VertxManageConfiguration.Marker.class)
+@EnableConfigurationProperties(VertxManageProperties.class)
+public class VertxManageAutoConfiguration {
 
-    @Autowired
-    private Vertx vertx;
+	@Autowired
+	private Vertx vertx;
 
-    @Autowired
-    private VertxRestProperties restProperties;
+	@Autowired
+	private VertxRestProperties restProperties;
 
-    @Autowired
-    private SpringVerticleFactory verticleFactory;
+	@Autowired
+	private SpringVerticleFactory verticleFactory;
 
-    @EventListener
-    public void deployVerticles(ApplicationReadyEvent event) throws Exception {
-        DeploymentOptions deployOptions = new DeploymentOptions();
-        deployOptions.setInstances(restProperties.getInstances());
-        String verticleName = verticleFactory.verticleName(HttpRestVerticle.class);
-        VertxHelper.deployVerticle(vertx, deployOptions, verticleFactory, verticleName);
-    }
+	@EventListener
+	public void deployVerticles(ApplicationReadyEvent event) throws Exception {
+		DeploymentOptions deployOptions = new DeploymentOptions();
+		deployOptions.setInstances(restProperties.getInstances());
+		String verticleName = verticleFactory.verticleName(HttpRestVerticle.class);
+		VertxHelper.deployVerticle(vertx, deployOptions, verticleFactory, verticleName);
+	}
 
-    @Bean
-    @Scope("prototype")
-    public HttpRestVerticle restVerticle(ApplicationContext applicationContext) {
-        HttpRestVerticle restVerticle = new HttpRestVerticle();
-        restVerticle.setApplicationContext(applicationContext);
-        restVerticle.setRestProperties(restProperties);
-        return restVerticle;
-    }
+	@Bean
+	@Scope("prototype")
+	public HttpRestVerticle restVerticle(ApplicationContext applicationContext) {
+		HttpRestVerticle restVerticle = new HttpRestVerticle();
+		restVerticle.setApplicationContext(applicationContext);
+		restVerticle.setRestProperties(restProperties);
+		return restVerticle;
+	}
 
-    @Bean
-    public SpringVerticleFactory verticleFactory(ApplicationContext applicationContext) {
-        SpringVerticleFactory verticleFactory = new SpringVerticleFactory();
-        verticleFactory.setApplicationContext(applicationContext);
-        return verticleFactory;
-    }
+	@Bean
+	public SpringVerticleFactory verticleFactory(ApplicationContext applicationContext) {
+		SpringVerticleFactory verticleFactory = new SpringVerticleFactory();
+		verticleFactory.setApplicationContext(applicationContext);
+		return verticleFactory;
+	}
 
 }

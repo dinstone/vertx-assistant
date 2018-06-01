@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.dinstone.vertx.starter.verticle;
+package com.dinstone.vertx.verticle;
 
 import org.springframework.context.ApplicationContext;
 
