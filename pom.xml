@@ -203,6 +203,7 @@
 	<modules>
 		<module>vertx-web</module>
 		<module>vertx-starter</module>
+		<module>vertx-rs</module>
 	</modules>
 
 </project>
