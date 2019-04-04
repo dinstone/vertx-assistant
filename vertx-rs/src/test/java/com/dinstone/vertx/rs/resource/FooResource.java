@@ -13,18 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dinstone.vertx.web.resource;
+package com.dinstone.vertx.rs.resource;
 
-import com.dinstone.vertx.web.annotation.Get;
-import com.dinstone.vertx.web.annotation.Handler;
-import com.dinstone.vertx.web.annotation.Path;
+import com.dinstone.vertx.rs.annotation.Get;
+import com.dinstone.vertx.rs.annotation.RestService;
 
 import io.vertx.ext.web.RoutingContext;
 
-@Handler
-@Path("/foo")
+@RestService("/foo")
 public interface FooResource {
 
-	@Get
-	public void g(RoutingContext ctx);
+    @Get
+    public void g(RoutingContext ctx);
 }
