@@ -15,6 +15,7 @@
  */
 package com.dinstone.vertx.rs.resource;
 
+import com.dinstone.vertx.rs.annotation.Context;
 import com.dinstone.vertx.rs.annotation.Get;
 import com.dinstone.vertx.rs.annotation.RestService;
 
@@ -24,5 +25,5 @@ import io.vertx.ext.web.RoutingContext;
 public interface FooResource {
 
     @Get
-    public void g(RoutingContext ctx);
+    public void g(@Context RoutingContext ctx);
 }

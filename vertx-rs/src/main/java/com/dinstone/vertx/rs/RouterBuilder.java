@@ -15,74 +15,75 @@
  */
 package com.dinstone.vertx.rs;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.dinstone.vertx.rs.resolver.AnnotationRouteResolver;
+import com.dinstone.vertx.rs.resolver.JsonMessageConverter;
 import com.dinstone.vertx.rs.resolver.RouteResolver;
 
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.RoutingContext;
 
 public interface RouterBuilder {
 
-    class DefaultRouterBuilder implements RouterBuilder {
+	class DefaultRouterBuilder implements RouterBuilder {
+		private final List<Object> services = new ArrayList<>();
+		private final List<RouteResolver> resolvers = new ArrayList<>();
+		private final MessageConverters converters = new MessageConverters();
+		private Router router;
 
-        private final List<Object> services = new ArrayList<>();
+		public DefaultRouterBuilder(Vertx vertx) {
+			router = Router.router(vertx);
+			converters.add("application/json", new JsonMessageConverter());
+			resolver(new AnnotationRouteResolver());
+		}
 
-        private final List<RouteResolver> resolvers = new ArrayList<>();
+		@Override
+		public RouterBuilder handler(Object service) {
+			if (service != null) {
+				services.add(service);
+			}
 
-        private Router router;
+			return this;
+		}
 
-        public DefaultRouterBuilder(Vertx vertx) {
-            router = Router.router(vertx);
-            resolver(new AnnotationRouteResolver());
-        }
+		@Override
+		public RouterBuilder resolver(RouteResolver resolver) {
+			if (resolver != null) {
+				this.resolvers.add(resolver);
+			}
+			return this;
+		}
 
-        @Override
-        public RouterBuilder handler(Object service) {
-            if (service != null) {
-                services.add(service);
-            }
+		@SuppressWarnings("unchecked")
+		@Override
+		public Router build() {
+			for (Object service : services) {
+				if (service instanceof Handler) {
+					router.route().handler((Handler<RoutingContext>) service);
+					continue;
+				}
 
-            return this;
-        }
+				for (RouteResolver resolver : resolvers) {
+					resolver.process(router, service, converters);
+				}
+			}
 
-        @Override
-        public RouterBuilder resolver(RouteResolver resolver) {
-            if (resolver != null) {
-                this.resolvers.add(resolver);
-            }
-            return this;
-        }
+			return router;
+		}
 
-        @Override
-        public Router build() {
-            for (Object service : services) {
-                process(router, service);
-            }
+	}
 
-            return router;
-        }
+	public static RouterBuilder create(Vertx vertx) {
+		return new DefaultRouterBuilder(vertx);
+	}
 
-        private void process(Router router, Object service) {
-            final Class<?> clazz = service.getClass();
-            for (final Method method : clazz.getMethods()) {
-                for (RouteResolver resolver : resolvers) {
-                    resolver.process(router, service, clazz, method);
-                }
-            }
-        }
-    }
+	public RouterBuilder resolver(RouteResolver resolver);
 
-    public static RouterBuilder create(Vertx vertx) {
-        return new DefaultRouterBuilder(vertx);
-    }
+	public RouterBuilder handler(Object handler);
 
-    public RouterBuilder resolver(RouteResolver resolver);
-
-    public RouterBuilder handler(Object handler);
-
-    public Router build();
+	public Router build();
 }

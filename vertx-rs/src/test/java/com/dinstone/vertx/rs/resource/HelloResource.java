@@ -16,6 +16,7 @@
 package com.dinstone.vertx.rs.resource;
 
 import com.dinstone.vertx.rs.annotation.Consumes;
+import com.dinstone.vertx.rs.annotation.Context;
 import com.dinstone.vertx.rs.annotation.Get;
 import com.dinstone.vertx.rs.annotation.Post;
 import com.dinstone.vertx.rs.annotation.Produces;
@@ -27,30 +28,28 @@ import io.vertx.ext.web.RoutingContext;
 @RestService("/hello")
 public class HelloResource {
 
-    @Get
-    public void g(RoutingContext ctx) {
-        ctx.response().end("Hello ws!");
-    }
+	@Get
+	public void g(@Context RoutingContext ctx) {
+		ctx.response().end("Hello ws!");
+	}
 
-    @Get("/g/:name")
-    public void hello(RoutingContext ctx) {
-        String message = "hello";
-        String name = ctx.request().getParam("name");
-        if (name != null) {
-            message += " " + name;
-        }
+	@Get("/g/:name")
+	public void hello(@Context RoutingContext ctx) {
+		String message = "hello";
+		String name = ctx.request().getParam("name");
+		if (name != null) {
+			message += " " + name;
+		}
 
-        JsonObject json = new JsonObject().put("message", message);
-        ctx.response().end(json.encode());
-    }
+		JsonObject json = new JsonObject().put("message", message);
+		ctx.response().end(json.encode());
+	}
 
-    @Post("/p")
-    @Produces("text/plain")
-    @Consumes("text/json")
-    public void post(RoutingContext ctx) {
-        ctx.request().bodyHandler(rs -> {
-            String content = rs.toJsonObject().getString("content");
-            ctx.response().end("Hello " + content + "!");
-        });
-    }
+	@Post("/p")
+	@Produces("text/plain")
+	@Consumes("text/json")
+	public void post(@Context RoutingContext ctx) {
+		String content = ctx.getBodyAsJson().getString("content");
+		ctx.response().putHeader("Content-Type", "text/plain").end("Hello " + content + "!");
+	}
 }

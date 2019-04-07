@@ -15,6 +15,7 @@
  */
 package com.dinstone.vertx.rs.resource;
 
+import com.dinstone.vertx.rs.annotation.Context;
 import com.dinstone.vertx.rs.annotation.Get;
 import com.dinstone.vertx.rs.annotation.RestService;
 
@@ -23,10 +24,10 @@ import io.vertx.ext.web.RoutingContext;
 @RestService("/foo")
 public class FooImplResource implements FooResource {
 
-    @Override
-    @Get("/impl")
-    public void g(RoutingContext ctx) {
-        ctx.response().end("Hello foo!");
-    }
+	@Override
+	@Get("/impl")
+	public void g(@Context RoutingContext ctx) {
+		ctx.response().end("Hello foo!");
+	}
 
 }

@@ -15,12 +15,14 @@
  */
 package com.dinstone.vertx.rs.resolver;
 
-import java.lang.reflect.Method;
+import com.dinstone.vertx.rs.MessageConverters;
 
 import io.vertx.ext.web.Router;
 
 public interface RouteResolver {
 
-    void process(Router router, Object instance, Class<?> clazz, Method method);
+//    void process(Router router, Object instance, Class<?> clazz, Method method);
+
+	void process(Router router, Object service, MessageConverters converters);
 
 }
