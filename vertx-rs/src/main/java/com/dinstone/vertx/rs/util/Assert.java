@@ -1,4 +1,4 @@
-package com.dinstone.vertx.rs;
+package com.dinstone.vertx.rs.util;
 
 import java.util.Collection;
 import java.util.List;
@@ -16,7 +16,6 @@ public final class Assert {
      * @param message fail message aka: "forgot to implement this"
      */
     public static void always(String message) {
-
         throw new IllegalArgumentException(message);
     }
 
@@ -28,7 +27,6 @@ public final class Assert {
      * @throws IllegalArgumentException if test is true
      */
     public static void isFalse(boolean test, String message) {
-
         if (test) {
             throw new IllegalArgumentException(message);
         }
@@ -42,7 +40,6 @@ public final class Assert {
      * @throws IllegalArgumentException if test is false
      */
     public static void isTrue(boolean test, String message) {
-
         isFalse(!test, message);
     }
 
@@ -55,7 +52,6 @@ public final class Assert {
      * @throws IllegalArgumentException if object != null
      */
     public static <T> void isNull(T test, String message) {
-
         isTrue(test == null, message);
     }
 
@@ -68,7 +64,6 @@ public final class Assert {
      * @throws IllegalArgumentException if object == null
      */
     public static <T> void notNull(T test, String message) {
-
         isFalse(test == null, message);
     }
 
@@ -103,7 +98,6 @@ public final class Assert {
      * @throws IllegalArgumentException if list == null or list.size() == 0
      */
     public static <T> void notNullOrEmpty(Collection<T> list, String message) {
-
         isFalse(list == null || list.size() == 0, message);
     }
 
@@ -116,7 +110,6 @@ public final class Assert {
      * @throws IllegalArgumentException if list == null or list.size() == 0
      */
     public static <T> void notNullOrEmpty(Set<T> set, String message) {
-
         isFalse(set == null || set.size() == 0, message);
     }
 
@@ -129,7 +122,6 @@ public final class Assert {
      * @throws IllegalArgumentException if list == null or list.size() == 0
      */
     public static <T> void notNullOrEmpty(T[] array, String message) {
-
         isFalse(array == null || array.length == 0, message);
     }
 
@@ -143,7 +135,6 @@ public final class Assert {
      * @throws IllegalArgumentException if list == null or list.size() == 0
      */
     public static <T, K> void notNullOrEmpty(Map<T, K> map, String message) {
-
         isFalse(map == null || map.size() == 0, message);
     }
 
@@ -157,7 +148,6 @@ public final class Assert {
      *                                  0
      */
     public static <T> void isNullOrEmpty(List<T> list, String message) {
-
         isTrue(list == null || list.size() == 0, message);
     }
 
@@ -171,7 +161,6 @@ public final class Assert {
      *                                  0
      */
     public static <T> void isNullOrEmpty(Set<T> set, String message) {
-
         isTrue(set == null || set.size() == 0, message);
     }
 
@@ -185,7 +174,6 @@ public final class Assert {
      *                                  0
      */
     public static <T> void isNullOrEmpty(T[] array, String message) {
-
         isTrue(array == null || array.length == 0, message);
     }
 
@@ -200,7 +188,6 @@ public final class Assert {
      *                                  0
      */
     public static <T, K> void isNullOrEmpty(Map<T, K> map, String message) {
-
         isTrue(map == null || map.size() == 0, message);
     }
 }

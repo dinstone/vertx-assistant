@@ -22,7 +22,8 @@ import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
-import com.dinstone.vertx.rs.MessageConverters;
+import com.dinstone.vertx.rs.core.RouteResolver;
+import com.dinstone.vertx.rs.core.RouterContext;
 
 import io.vertx.core.Handler;
 import io.vertx.ext.web.Router;
@@ -100,7 +101,7 @@ public class MethodNameRouteResolver implements RouteResolver {
     }
 
 	@Override
-	public void process(Router router, Object service, MessageConverters converters) {
+	public void process(RouterContext converters, Router router, Object service) {
 		// TODO Auto-generated method stub
 		
 	}

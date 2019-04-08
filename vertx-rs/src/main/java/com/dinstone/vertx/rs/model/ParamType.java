@@ -1,4 +1,4 @@
-package com.dinstone.vertx.rs;
+package com.dinstone.vertx.rs.model;
 
 /**
  *

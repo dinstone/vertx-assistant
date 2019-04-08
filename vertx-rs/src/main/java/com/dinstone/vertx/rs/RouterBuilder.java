@@ -18,9 +18,11 @@ package com.dinstone.vertx.rs;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dinstone.vertx.rs.resolver.AnnotationRouteResolver;
-import com.dinstone.vertx.rs.resolver.JsonMessageConverter;
-import com.dinstone.vertx.rs.resolver.RouteResolver;
+import com.dinstone.vertx.rs.core.AnnotationRouteResolver;
+import com.dinstone.vertx.rs.core.JsonMessageConverter;
+import com.dinstone.vertx.rs.core.MessageConverter;
+import com.dinstone.vertx.rs.core.RouteResolver;
+import com.dinstone.vertx.rs.core.RouterContext;
 
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
@@ -29,61 +31,73 @@ import io.vertx.ext.web.RoutingContext;
 
 public interface RouterBuilder {
 
-	class DefaultRouterBuilder implements RouterBuilder {
-		private final List<Object> services = new ArrayList<>();
-		private final List<RouteResolver> resolvers = new ArrayList<>();
-		private final MessageConverters converters = new MessageConverters();
-		private Router router;
+    class DefaultRouterBuilder implements RouterBuilder {
+        private final List<Object> services = new ArrayList<>();
+        private final List<RouteResolver> resolvers = new ArrayList<>();
+        private final RouterContext routerContext = new RouterContext();
 
-		public DefaultRouterBuilder(Vertx vertx) {
-			router = Router.router(vertx);
-			converters.add("application/json", new JsonMessageConverter());
-			resolver(new AnnotationRouteResolver());
-		}
+        private Router router;
 
-		@Override
-		public RouterBuilder handler(Object service) {
-			if (service != null) {
-				services.add(service);
-			}
+        public DefaultRouterBuilder(Vertx vertx) {
+            router = Router.router(vertx);
 
-			return this;
-		}
+            converter(new JsonMessageConverter());
+            resolver(new AnnotationRouteResolver());
+        }
 
-		@Override
-		public RouterBuilder resolver(RouteResolver resolver) {
-			if (resolver != null) {
-				this.resolvers.add(resolver);
-			}
-			return this;
-		}
+        @Override
+        public RouterBuilder handler(Object service) {
+            if (service != null) {
+                services.add(service);
+            }
 
-		@SuppressWarnings("unchecked")
-		@Override
-		public Router build() {
-			for (Object service : services) {
-				if (service instanceof Handler) {
-					router.route().handler((Handler<RoutingContext>) service);
-					continue;
-				}
+            return this;
+        }
 
-				for (RouteResolver resolver : resolvers) {
-					resolver.process(router, service, converters);
-				}
-			}
+        @Override
+        public RouterBuilder converter(MessageConverter<?> converter) {
+            if (converter != null) {
+                routerContext.add(converter);
+            }
+            return this;
+        }
 
-			return router;
-		}
+        @Override
+        public RouterBuilder resolver(RouteResolver resolver) {
+            if (resolver != null) {
+                this.resolvers.add(resolver);
+            }
+            return this;
+        }
 
-	}
+        @SuppressWarnings("unchecked")
+        @Override
+        public Router build() {
+            for (Object service : services) {
+                if (service instanceof Handler) {
+                    router.route().handler((Handler<RoutingContext>) service);
+                    continue;
+                }
 
-	public static RouterBuilder create(Vertx vertx) {
-		return new DefaultRouterBuilder(vertx);
-	}
+                for (RouteResolver resolver : resolvers) {
+                    resolver.process(routerContext, router, service);
+                }
+            }
 
-	public RouterBuilder resolver(RouteResolver resolver);
+            return router;
+        }
 
-	public RouterBuilder handler(Object handler);
+    }
 
-	public Router build();
+    public static RouterBuilder create(Vertx vertx) {
+        return new DefaultRouterBuilder(vertx);
+    }
+
+    public RouterBuilder converter(MessageConverter<?> converter);
+
+    public RouterBuilder resolver(RouteResolver resolver);
+
+    public RouterBuilder handler(Object handler);
+
+    public Router build();
 }

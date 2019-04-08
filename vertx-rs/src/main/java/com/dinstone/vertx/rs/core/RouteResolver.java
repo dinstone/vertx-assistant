@@ -13,16 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dinstone.vertx.rs.resolver;
-
-import com.dinstone.vertx.rs.MessageConverters;
+package com.dinstone.vertx.rs.core;
 
 import io.vertx.ext.web.Router;
 
 public interface RouteResolver {
 
-//    void process(Router router, Object instance, Class<?> clazz, Method method);
-
-	void process(Router router, Object service, MessageConverters converters);
+    void process(RouterContext context, Router router, Object service);
 
 }
