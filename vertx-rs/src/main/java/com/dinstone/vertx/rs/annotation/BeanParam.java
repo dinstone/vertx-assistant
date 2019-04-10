@@ -24,5 +24,5 @@ import java.lang.annotation.Target;
 @Target({ ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD })
 public @interface BeanParam {
 
-    String value();
+    String value() default "";
 }

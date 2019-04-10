@@ -57,7 +57,7 @@ public interface RouterBuilder {
         @Override
         public RouterBuilder converter(MessageConverter<?> converter) {
             if (converter != null) {
-                routerContext.add(converter);
+                routerContext.addMessageConverter(converter);
             }
             return this;
         }

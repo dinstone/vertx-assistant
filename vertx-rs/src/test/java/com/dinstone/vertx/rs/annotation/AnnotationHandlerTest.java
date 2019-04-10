@@ -47,7 +47,7 @@ public class AnnotationHandlerTest {
         final Async async = ctx.async();
 
         final Router router = RouterBuilder.create(vertx).handler(new HelloResource()).build();
-        vertx.createHttpServer().requestHandler(router::accept).listen(8081, server -> {
+        vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
             if (server.failed()) {
                 ctx.fail(server.cause());
                 return;
@@ -78,7 +78,7 @@ public class AnnotationHandlerTest {
         final Async async = ctx.async();
 
         final Router router = RouterBuilder.create(vertx).handler(new HelloResource()).build();
-        vertx.createHttpServer().requestHandler(router::accept).listen(8081, server -> {
+        vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
             if (server.failed()) {
                 ctx.fail(server.cause());
                 return;
@@ -112,7 +112,7 @@ public class AnnotationHandlerTest {
         final Async async = ctx.async();
 
         final Router router = RouterBuilder.create(vertx).handler(new HelloResource()).build();
-        vertx.createHttpServer().requestHandler(router::handle).listen(8081, server -> {
+        vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
             if (server.failed()) {
                 ctx.fail(server.cause());
                 return;
@@ -143,7 +143,7 @@ public class AnnotationHandlerTest {
         final Async async = ctx.async();
 
         final Router router = RouterBuilder.create(vertx).handler(new HelloResourceSubclass()).build();
-        vertx.createHttpServer().requestHandler(router::accept).listen(8081, server -> {
+        vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
             if (server.failed()) {
                 ctx.fail(server.cause());
                 return;
@@ -174,7 +174,7 @@ public class AnnotationHandlerTest {
         final Async async = ctx.async();
 
         final Router router = RouterBuilder.create(vertx).handler(new FooImplResource()).build();
-        vertx.createHttpServer().requestHandler(router::accept).listen(8081, server -> {
+        vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
             if (server.failed()) {
                 ctx.fail(server.cause());
                 return;
@@ -216,7 +216,7 @@ public class AnnotationHandlerTest {
                 });
 
         final Router router = RouterBuilder.create(vertx).handler(handler).build();
-        vertx.createHttpServer().requestHandler(router::accept).listen(8081, server -> {
+        vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
             if (server.failed()) {
                 ctx.fail(server.cause());
                 return;

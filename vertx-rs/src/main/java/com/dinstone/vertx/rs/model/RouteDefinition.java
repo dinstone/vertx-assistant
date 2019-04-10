@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2016~2018 dinstone<dinstone@163.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.dinstone.vertx.rs.model;
 
 import java.lang.reflect.Method;
@@ -6,7 +21,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
- * Holds definition of a route as defined with annotations
+ * definition of a route
  */
 public class RouteDefinition {
 
@@ -34,8 +49,6 @@ public class RouteDefinition {
     private String httpMethod;
 
     private Method method;
-
-    private boolean futureType;
 
     /**
      * Type of return value
@@ -96,13 +109,13 @@ public class RouteDefinition {
         this.returnType = returnType;
     }
 
-    public List<Argument> getMethodParameters() {
+    public List<Argument> getArguments() {
         return arguments;
     }
 
-    public void setMethodParameters(List<Argument> methodParameters) {
-        if (methodParameters != null) {
-            this.arguments.addAll(methodParameters);
+    public void setArguments(List<Argument> arguments) {
+        if (arguments != null) {
+            this.arguments.addAll(arguments);
         }
     }
 
@@ -130,14 +143,6 @@ public class RouteDefinition {
         return returnType;
     }
 
-    public boolean isFutureType() {
-        return futureType;
-    }
-
-    public void setFutureType(boolean futureType) {
-        this.futureType = futureType;
-    }
-
     public boolean pathIsRegex() {
         return false;
     }
@@ -155,14 +160,14 @@ public class RouteDefinition {
             return false;
         }
 
-        return arguments.stream().anyMatch(param -> ParamType.cookie.equals(param.getParamType()));
+        return arguments.stream().anyMatch(arg -> ArgType.cookie.equals(arg.getArgType()));
     }
 
     @Override
     public String toString() {
         return "RouteDefinition [httpMethod=" + httpMethod + ", routePath=" + routePath + ", consumes="
                 + Arrays.toString(consumes) + ", produces=" + Arrays.toString(produces) + ", method=" + method
-                + ", futureType=" + futureType + ", arguments=" + arguments + "]";
+                + ", arguments=" + arguments + "]";
     }
 
 }

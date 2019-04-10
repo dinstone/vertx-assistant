@@ -1,7 +1,23 @@
+/*
+ * Copyright (C) 2016~2018 dinstone<dinstone@163.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.dinstone.vertx.rs.core;
 
-import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 import com.dinstone.vertx.rs.model.Argument;
 import com.dinstone.vertx.rs.model.RouteDefinition;
@@ -28,7 +44,7 @@ public abstract class AbstractRouteResolver implements RouteResolver {
 
     @Override
     public void process(RouterContext routerContext, Router router, Object service) {
-        List<RouteDefinition> definitions = getRouteDefinitions(service);
+        List<RouteDefinition> definitions = parseRouteDefinitions(service);
         for (RouteDefinition definition : definitions) {
             LOG.info("Registering " + definition);
 
@@ -49,11 +65,12 @@ public abstract class AbstractRouteResolver implements RouteResolver {
 
             if (definition.getProduces() != null) {
                 for (String item : definition.getProduces()) {
-                    route.produces(item); // ignore charset when binding
+                    // ignore charset when binding
+                    route.produces(item);
                 }
             }
 
-            // add BodyHandler in case request has a body ...
+            // add BodyHandler in case request has a body
             if (definition.hasBody()) {
                 route.handler(BodyHandler.create());
             }
@@ -63,10 +80,9 @@ public abstract class AbstractRouteResolver implements RouteResolver {
                 route.handler(CookieHandler.create());
             }
 
-            // bind handler // blocking or async
             Handler<RoutingContext> handler;
-            if (definition.isFutureType()) {
-                handler = futureHandler(service, definition, routerContext);
+            if (isAsyncType(definition.getReturnType())) {
+                handler = asyncHandler(service, definition, routerContext);
             } else {
                 handler = blockHandler(service, definition, routerContext);
             }
@@ -75,14 +91,44 @@ public abstract class AbstractRouteResolver implements RouteResolver {
         }
     }
 
-    protected abstract List<RouteDefinition> getRouteDefinitions(Object service);
+    protected abstract List<RouteDefinition> parseRouteDefinitions(Object service);
+
+    private static Handler<RoutingContext> asyncHandler(final Object service, final RouteDefinition definition,
+            RouterContext routerContext) {
+
+        return context -> {
+            try {
+                Object[] args = prepareArguments(context, definition, routerContext);
+                Object result = definition.getMethod().invoke(service, args);
+
+                if (result instanceof Future) {
+                    Future<?> future = (Future<?>) result;
+                    // wait for future to complete ... don't block vertx event bus in the mean time
+                    future.setHandler(handler -> {
+                        if (future.succeeded()) {
+                            try {
+                                Object futureResult = future.result();
+                                handleResponse(futureResult, context, definition, routerContext);
+                            } catch (Throwable e) {
+                                handleException(e, context, definition, routerContext);
+                            }
+                        } else {
+                            handleException(future.cause(), context, definition, routerContext);
+                        }
+                    });
+                }
+            } catch (Throwable e) {
+                handleException(e, context, definition, routerContext);
+            }
+        };
+    }
 
     private static Handler<RoutingContext> blockHandler(final Object service, final RouteDefinition definition,
             final RouterContext routerContext) {
 
         return context -> context.vertx().executeBlocking(future -> {
             try {
-                Object[] args = prepareArguments(definition, context, routerContext);
+                Object[] args = prepareArguments(context, definition, routerContext);
                 Object result = definition.getMethod().invoke(service, args);
                 future.complete(result);
             } catch (Throwable e) {
@@ -92,52 +138,61 @@ public abstract class AbstractRouteResolver implements RouteResolver {
             if (res.succeeded()) {
                 try {
                     Object result = res.result();
-                    produceResponse(result, context, definition, routerContext);
+                    handleResponse(result, context, definition, routerContext);
                 } catch (Throwable e) {
-                    handleException(e, context, definition);
+                    handleException(e, context, definition, routerContext);
                 }
             } else {
-                handleException(res.cause(), context, definition);
+                handleException(res.cause(), context, definition, routerContext);
             }
         });
     }
 
-    private static Handler<RoutingContext> futureHandler(final Object toInvoke, final RouteDefinition definition,
-            RouterContext routerContext) {
-
-        return context -> {
-            try {
-                Object[] args = prepareArguments(definition, context, routerContext);
-                Object result = definition.getMethod().invoke(toInvoke, args);
-
-                if (result instanceof Future) {
-                    Future<?> future = (Future<?>) result;
-                    // wait for future to complete ... don't block vertx event bus in the mean time
-                    future.setHandler(handler -> {
-                        if (future.succeeded()) {
-                            try {
-                                Object futureResult = future.result();
-                                produceResponse(futureResult, context, definition, routerContext);
-                            } catch (Throwable e) {
-                                handleException(e, context, definition);
-                            }
-                        } else {
-                            handleException(future.cause(), context, definition);
-                        }
-                    });
-                }
-            } catch (Throwable e) {
-                handleException(e, context, definition);
+    private static void handleResponse(Object result, RoutingContext context, RouteDefinition definition,
+            RouterContext routerContext) throws Throwable {
+        if (!context.response().ended()) {
+            MessageConverter<Object> messageConverter = null;
+            String contentType = context.getAcceptableContentType();
+            if (contentType != null) {
+                messageConverter = routerContext.getMessageConverter(contentType);
+            } else {
+                messageConverter = routerContext.getMessageConverter(definition.getProduces());
             }
-        };
+
+            if (messageConverter != null) {
+                messageConverter.write(result, context);
+            } else {
+                throw new IllegalStateException("can't find message converter for " + definition);
+            }
+        }
     }
 
-    private static Object[] prepareArguments(RouteDefinition definition, RoutingContext context,
+    @SuppressWarnings("unchecked")
+    private static void handleException(Throwable e, RoutingContext context, final RouteDefinition definition,
+            RouterContext routerContext) {
+        if (e instanceof ExecutionException || e instanceof InvocationTargetException) {
+            e = e.getCause();
+        }
+        LOG.error("handling exception for " + definition, e);
+
+        try {
+            ExceptionHandler<Throwable> handler = (ExceptionHandler<Throwable>) routerContext.getExceptionHandler(e.getClass());
+            handler.handle(e, context);
+        } catch (Throwable ex) {
+            LOG.warn("handled exception failed : " + ex.getMessage(), e);
+        }
+
+        if (!context.response().ended()) {
+            context.response().setStatusCode(503).end("The service is unavailable, " + e.getMessage());
+        }
+    }
+
+    private static Object[] prepareArguments(RoutingContext context, RouteDefinition definition,
             RouterContext routerContext) throws Exception {
-        List<Argument> parameters = definition.getMethodParameters();
+        List<Argument> parameters = definition.getArguments();
         Object[] arguments = new Object[parameters.size()];
         for (Argument parameter : parameters) {
-            switch (parameter.getParamType()) {
+            switch (parameter.getArgType()) {
             case context:
                 arguments[parameter.getParamIndex()] = getContextValue(definition, context, parameter);
                 break;
@@ -232,12 +287,21 @@ public abstract class AbstractRouteResolver implements RouteResolver {
     }
 
     private static Object convertBean(RouteDefinition definition, RoutingContext context, Argument parameter,
-            RouterContext routerContext) throws IOException {
-        MessageConverter<Object> converter = routerContext.get(definition.getConsumes());
-        if (converter != null) {
-            return converter.read(parameter.getParamClazz(), context);
+            RouterContext routerContext) throws Exception {
+        String contentType = context.request().getHeader("Content-Type");
+        if (contentType != null) {
+            contentType = contentType.split(";", 2)[0];
         }
-        return null;
+
+        MessageConverter<Object> converter = routerContext.getMessageConverter(contentType);
+        if (converter == null) {
+            converter = routerContext.getMessageConverter(definition.getConsumes());
+        }
+
+        if (converter == null) {
+            throw new IllegalStateException("no message convert for " + parameter);
+        }
+        return converter.read(parameter.getParamClazz(), context);
     }
 
     private static Object getContextValue(RouteDefinition definition, RoutingContext context, Argument parameter) {
@@ -272,84 +336,20 @@ public abstract class AbstractRouteResolver implements RouteResolver {
             }
         }
 
-        throw new RuntimeException("Can't provide @Context of type: " + paramClazz);
+        throw new RuntimeException("can't provide @Context of type: " + paramClazz);
     }
 
-    private static <T> void produceResponse(Object result, RoutingContext context, RouteDefinition definition,
-            RouterContext converters) throws Throwable {
-        HttpServerResponse response = context.response();
-        if (!definition.isFutureType() && !response.ended()) {
-            MessageConverter<Object> messageConverter = null;
-            String contentType = context.getAcceptableContentType();
-            if (contentType != null) {
-                messageConverter = converters.get(contentType);
-            } else {
-                messageConverter = converters.get(definition.getProduces());
-            }
-
-            if (messageConverter != null) {
-                messageConverter.write(result, context);
-            } else {
-                throw new IllegalStateException("can't find message converter for " + definition);
-            }
-        }
+    private static boolean isAsyncType(Class<?> returnType) {
+        return isVoid(returnType) || isFuture(returnType);
     }
 
-    private static void handleException(Throwable e, RoutingContext context, final RouteDefinition definition) {
+    private static boolean isFuture(Class<?> returnType) {
+        return returnType.equals(Future.class) || returnType.isInstance(Future.class)
+                || Future.class.isAssignableFrom(returnType);
+    }
 
-        LOG.error("Handling exception: ", e);
-        // ExecuteException ex = getExecuteException(e);
-        //
-        // // get appropriate exception handler/writer ...
-        // ExceptionHandler handler;
-        // try {
-        // Class<? extends Throwable> clazz;
-        // if (ex.getCause() == null) {
-        // clazz = ex.getClass();
-        // } else {
-        // clazz = ex.getCause().getClass();
-        // }
-        //
-        // Class<? extends ExceptionHandler>[] exHandlers = null;
-        // if (definition != null) {
-        // exHandlers = definition.getExceptionHandlers();
-        // }
-        //
-        // handler = handlers.getExceptionHandler(clazz, exHandlers, injectionProvider,
-        // context);
-        // } catch (ClassFactoryException classException) {
-        // // Can't provide exception handler ... rethrow
-        // log.error("Can't provide exception handler!", classException);
-        // // fall back to generic ...
-        // handler = new GenericExceptionHandler();
-        // ex = new ExecuteException(500, classException);
-        // } catch (ContextException contextException) {
-        // // Can't provide @Context for handler ... rethrow
-        // log.error("Can't provide @Context!", contextException);
-        // // fall back to generic ...
-        // handler = new GenericExceptionHandler();
-        // ex = new ExecuteException(500, contextException);
-        // }
-
-        HttpServerResponse response = context.response();
-        response.setStatusCode(500);
-        // handler.addResponseHeaders(definition, response);
-
-        try {
-            // handler.write(ex.getCause(), context.request(), context.response());
-
-            // eventExecutor.triggerEvents(ex.getCause(), response.getStatusCode(),
-            // definition, context,
-            // injectionProvider);
-        } catch (Throwable handlerException) {
-            // this should not happen
-            LOG.error("Failed to write out handled exception: " + e.getMessage(), e);
-        }
-
-        // end response ...
-        if (!response.ended()) {
-            response.end();
-        }
+    private static boolean isVoid(Class<?> returnType) {
+        return returnType.equals(Void.TYPE) || returnType.equals(Void.class);
     }
 
 }

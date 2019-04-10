@@ -1,3 +1,18 @@
+/*
+ * Copyright (C) 2016~2018 dinstone<dinstone@163.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.dinstone.vertx.rs.model;
 
 import com.dinstone.vertx.rs.util.Assert;
@@ -7,47 +22,34 @@ import com.dinstone.vertx.rs.util.Assert;
  */
 public class Argument {
 
-    /**
-     * Query or Path type
-     */
-    private ParamType paramType;
+    private ArgType argType;
 
-    /**
-     * parameter to search for in method annotations {@code @PathParam}
-     * {@code @QueryParam}
-     */
+    private int paramIndex;
+
     private String paramName;
 
-    /**
-     * index matching method argument index 0..N-1
-     */
-    private int paramIndex = -1;
-
-    /**
-     * type of parameter expected by method
-     */
     private Class<?> paramClazz;
 
-    public Argument(ParamType paramType, String paramName, Class<?> paramClazz, int paramIndex) {
+    public Argument(int paramIndex, String paramName, Class<?> paramClazz, ArgType argType) {
         Assert.notNull(paramName, "paramName is null");
         Assert.isTrue(paramIndex >= 0, "Can't set negative argument index!");
 
+        this.argType = argType;
         this.paramName = paramName;
-        this.paramType = paramType;
         this.paramIndex = paramIndex;
         this.paramClazz = paramClazz;
     }
 
-    public ParamType getParamType() {
-        return paramType;
-    }
-
-    public String getParamName() {
-        return paramName;
+    public ArgType getArgType() {
+        return argType;
     }
 
     public int getParamIndex() {
         return paramIndex;
+    }
+
+    public String getParamName() {
+        return paramName;
     }
 
     public Class<?> getParamClazz() {
@@ -56,7 +58,7 @@ public class Argument {
 
     @Override
     public String toString() {
-        return "Argument [paramIndex=" + paramIndex + ", paramName=" + paramName + ", paramType=" + paramType
+        return "Argument [paramIndex=" + paramIndex + ", paramName=" + paramName + ", paramType=" + argType
                 + ", paramClazz=" + paramClazz + "]";
     }
 

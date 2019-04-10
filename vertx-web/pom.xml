@@ -11,7 +11,7 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-web</artifactId>
-            <version>3.6.3</version>
+            <version>3.7.0</version>
         </dependency>
 
         <dependency>
@@ -23,7 +23,7 @@
         <dependency>
             <groupId>io.vertx</groupId>
             <artifactId>vertx-unit</artifactId>
-            <version>3.6.3</version>
+            <version>3.7.0</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

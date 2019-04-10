@@ -24,5 +24,4 @@ import java.lang.annotation.Target;
 @Target({ ElementType.PARAMETER, ElementType.METHOD, ElementType.FIELD })
 public @interface Context {
 
-	String value() default "";
 }
