@@ -17,6 +17,8 @@ package com.dinstone.vertx.web.core;
 
 import java.io.IOException;
 
+import com.dinstone.vertx.web.MessageConverter;
+
 import io.vertx.core.buffer.Buffer;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.RoutingContext;

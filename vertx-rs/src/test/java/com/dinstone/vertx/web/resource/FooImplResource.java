@@ -17,11 +17,11 @@ package com.dinstone.vertx.web.resource;
 
 import com.dinstone.vertx.web.annotation.Context;
 import com.dinstone.vertx.web.annotation.Get;
-import com.dinstone.vertx.web.annotation.WebService;
+import com.dinstone.vertx.web.annotation.WebHandler;
 
 import io.vertx.ext.web.RoutingContext;
 
-@WebService("/foo")
+@WebHandler("/foo")
 public class FooImplResource implements FooResource {
 
 	@Override

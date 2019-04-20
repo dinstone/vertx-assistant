@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dinstone.vertx.web.core;
+package com.dinstone.vertx.web;
+
+import com.dinstone.vertx.web.core.RouterContext;
 
 import io.vertx.ext.web.Router;
 
 public interface RouteResolver {
 
-    void process(RouterContext context, Router router, Object service);
+	void resolve(RouterContext context, Router router, Object handler);
 
 }

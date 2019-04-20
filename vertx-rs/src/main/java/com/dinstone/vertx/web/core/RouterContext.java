@@ -22,6 +22,9 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import com.dinstone.vertx.web.ExceptionHandler;
+import com.dinstone.vertx.web.MessageConverter;
+
 public class RouterContext {
 
     private final ExceptionHandler<Throwable> defaultExceptionHandler = new DefaultExceptionHandler();

@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dinstone.vertx.web.core;
 
-import java.io.IOException;
+package com.dinstone.vertx.web.annotation;
 
-import io.vertx.ext.web.RoutingContext;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-public interface MessageConverter<T> {
+@Retention(RetentionPolicy.RUNTIME)
+@Target(ElementType.TYPE)
+public @interface WebHandler {
 
-    public String mediaType();
-
-    public T read(Class<? extends T> clazz, RoutingContext context) throws Exception;
-
-    void write(T result, RoutingContext context) throws IOException;
+	String value() default "";
 }

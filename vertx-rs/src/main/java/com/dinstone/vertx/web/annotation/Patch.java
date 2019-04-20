@@ -13,17 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dinstone.vertx.web.resource;
+package com.dinstone.vertx.web.annotation;
 
-import com.dinstone.vertx.web.annotation.Context;
-import com.dinstone.vertx.web.annotation.Get;
-import com.dinstone.vertx.web.annotation.WebHandler;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
-import io.vertx.ext.web.RoutingContext;
-
-@WebHandler("/foo")
-public interface FooResource {
-
-    @Get
-    public void g(@Context RoutingContext ctx);
+@Retention(RetentionPolicy.RUNTIME)
+@Target({ ElementType.METHOD })
+public @interface Patch {
+    String value() default "";
 }

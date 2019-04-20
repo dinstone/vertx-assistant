@@ -18,6 +18,8 @@ package com.dinstone.vertx.web.core;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import com.dinstone.vertx.web.ExceptionHandler;
+
 import io.vertx.core.http.HttpServerResponse;
 import io.vertx.core.json.Json;
 import io.vertx.ext.web.RoutingContext;

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
+import com.dinstone.vertx.web.RouteResolver;
 import com.dinstone.vertx.web.annotation.BeanParam;
 import com.dinstone.vertx.web.annotation.Consumes;
 import com.dinstone.vertx.web.annotation.Context;
@@ -38,7 +39,7 @@ import com.dinstone.vertx.web.annotation.Post;
 import com.dinstone.vertx.web.annotation.Produces;
 import com.dinstone.vertx.web.annotation.Put;
 import com.dinstone.vertx.web.annotation.QueryParam;
-import com.dinstone.vertx.web.annotation.WebService;
+import com.dinstone.vertx.web.annotation.WebHandler;
 import com.dinstone.vertx.web.model.ArgType;
 import com.dinstone.vertx.web.model.Argument;
 import com.dinstone.vertx.web.model.RouteDefinition;
@@ -53,9 +54,9 @@ public class AnnotationRouteResolver extends AbstractRouteResolver implements Ro
     @Override
     protected List<RouteDefinition> parseRouteDefinitions(Object service) {
         Class<? extends Object> clazz = service.getClass();
-        WebService webService = getAnnotation(clazz, WebService.class);
+        WebHandler webService = getAnnotation(clazz, WebHandler.class);
         if (webService == null) {
-            throw new IllegalStateException("without @WebService annotation");
+            throw new IllegalStateException("without @WebHandler annotation");
         }
         Produces produces = getAnnotation(clazz, Produces.class);
         Consumes consumes = getAnnotation(clazz, Consumes.class);
@@ -90,7 +91,7 @@ public class AnnotationRouteResolver extends AbstractRouteResolver implements Ro
         return routeDefinitions;
     }
 
-    private RouteDefinition parseRouteDefinition(WebService rs, Produces produces, Consumes consumes, Method method)
+    private RouteDefinition parseRouteDefinition(WebHandler rs, Produces produces, Consumes consumes, Method method)
             throws Throwable {
         String httpMethod = null;
         String methodPath = null;

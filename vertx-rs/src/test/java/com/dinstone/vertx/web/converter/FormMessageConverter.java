@@ -18,8 +18,8 @@ package com.dinstone.vertx.web.converter;
 import java.io.IOException;
 import java.net.URLDecoder;
 
+import com.dinstone.vertx.web.MessageConverter;
 import com.dinstone.vertx.web.core.MediaType;
-import com.dinstone.vertx.web.core.MessageConverter;
 
 import io.vertx.core.MultiMap;
 import io.vertx.ext.web.RoutingContext;

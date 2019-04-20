@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dinstone.vertx.web.resource;
+package com.dinstone.vertx.web;
 
-import com.dinstone.vertx.web.annotation.Context;
-import com.dinstone.vertx.web.annotation.Get;
-import com.dinstone.vertx.web.annotation.WebHandler;
+import java.io.IOException;
 
 import io.vertx.ext.web.RoutingContext;
 
-@WebHandler("/foo")
-public interface FooResource {
+public interface MessageConverter<T> {
 
-    @Get
-    public void g(@Context RoutingContext ctx);
+    public String mediaType();
+
+    public T read(Class<? extends T> clazz, RoutingContext context) throws Exception;
+
+    void write(T result, RoutingContext context) throws IOException;
 }

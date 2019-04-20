@@ -20,12 +20,12 @@ import com.dinstone.vertx.web.annotation.Context;
 import com.dinstone.vertx.web.annotation.Get;
 import com.dinstone.vertx.web.annotation.Post;
 import com.dinstone.vertx.web.annotation.Produces;
-import com.dinstone.vertx.web.annotation.WebService;
+import com.dinstone.vertx.web.annotation.WebHandler;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
-@WebService("/hello")
+@WebHandler("/hello")
 public class HelloResource {
 
     @Get

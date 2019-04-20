@@ -24,43 +24,58 @@ import com.dinstone.vertx.web.annotation.PathParam;
 import com.dinstone.vertx.web.annotation.Post;
 import com.dinstone.vertx.web.annotation.Produces;
 import com.dinstone.vertx.web.annotation.QueryParam;
-import com.dinstone.vertx.web.annotation.WebService;
+import com.dinstone.vertx.web.annotation.WebHandler;
 
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
 import io.vertx.ext.web.RoutingContext;
 
-@WebService("/ur")
+@WebHandler("/ur")
 @Produces("application/json")
 public class UserResource {
 
-    @Post("/c/:name")
-    public UserBean c(@PathParam("name") String name, @QueryParam("age") int age, @FormParam("sex") boolean sex) {
-        return new UserBean(name, age, sex);
-    }
+	@Post("/c/:name")
+	public UserBean c(@PathParam("name") String name, @QueryParam("age") int age, @FormParam("sex") boolean sex) {
+		return new UserBean(name, age, sex);
+	}
 
-    @Post("/bm")
-    public UserBean b(@BeanParam MultiMap map, @HeaderParam("Content-Type") String type) {
-        System.out.println("Content-Type: " + type);
-        return new UserBean(map.get("name"), Integer.parseInt(map.get("age")), Boolean.parseBoolean(map.get("sex")));
-    }
+	@Post("/bm")
+	public UserBean b(@BeanParam MultiMap map, @HeaderParam("Content-Type") String type) {
+		System.out.println("Content-Type: " + type);
+		return new UserBean(map.get("name"), Integer.parseInt(map.get("age")), Boolean.parseBoolean(map.get("sex")));
+	}
 
-    @Post("/bp")
-    public int bp(@BeanParam UserBean user) {
-        return user.getAge();
-    }
+	@Post("/bp")
+	public int bp(@BeanParam UserBean user) {
+		return user.getAge();
+	}
 
-    @Post("/bpf")
-    public Future<UserBean> bpf(@BeanParam UserBean user) {
-        Future<UserBean> future = Future.future();
-        future.complete(user);
-        return future;
-    }
+	@Post("/bpf")
+	public Future<UserBean> bpf(@BeanParam UserBean user) {
+		Future<UserBean> future = Future.future();
+		future.complete(user);
+		return future;
+	}
 
-    @Get("/vfn")
-    public Void vfn(@Context RoutingContext context) {
-        context.response().end("OK");
+	@Get("/vfn")
+	public Void vfn(@Context RoutingContext context) {
+		context.response().end("OK");
 
-        return null;
-    }
+		return null;
+	}
+
+	@Get("/reg/([^\\/]+)/([^\\/]+)")
+	public Void reg(@Context RoutingContext context, @PathParam("param0") String name,
+			@PathParam("param1") String nick) {
+		context.response().end("OK");
+
+		return null;
+	}
+
+	@Get("/regp/(?<name>[^\\/]+)/(?<nick>[^\\/]+)")
+	public Void regp(@Context RoutingContext context, @PathParam("name") String name, @PathParam("nick") String nick) {
+		context.response().end("OK");
+
+		return null;
+	}
 }

@@ -19,6 +19,9 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
+import com.dinstone.vertx.web.ExceptionHandler;
+import com.dinstone.vertx.web.MessageConverter;
+import com.dinstone.vertx.web.RouteResolver;
 import com.dinstone.vertx.web.model.Argument;
 import com.dinstone.vertx.web.model.RouteDefinition;
 import com.dinstone.vertx.web.util.Assert;
@@ -43,7 +46,7 @@ public abstract class AbstractRouteResolver implements RouteResolver {
     private final static Logger LOG = LoggerFactory.getLogger(AbstractRouteResolver.class);
 
     @Override
-    public void process(RouterContext routerContext, Router router, Object service) {
+    public void resolve(RouterContext routerContext, Router router, Object service) {
         List<RouteDefinition> definitions = parseRouteDefinitions(service);
         for (RouteDefinition definition : definitions) {
             LOG.info("Registering " + definition);
