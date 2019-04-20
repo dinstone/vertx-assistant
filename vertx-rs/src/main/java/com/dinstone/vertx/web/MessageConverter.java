@@ -19,11 +19,18 @@ import java.io.IOException;
 
 import io.vertx.ext.web.RoutingContext;
 
+/**
+ * coverter request message or response message by media type
+ * 
+ * @author dinstone
+ *
+ * @param <T>
+ */
 public interface MessageConverter<T> {
 
-    public String mediaType();
+	public String mediaType();
 
-    public T read(Class<? extends T> clazz, RoutingContext context) throws Exception;
+	public T read(Class<? extends T> clazz, RoutingContext context) throws Exception;
 
-    void write(T result, RoutingContext context) throws IOException;
+	void write(T result, RoutingContext context) throws IOException;
 }

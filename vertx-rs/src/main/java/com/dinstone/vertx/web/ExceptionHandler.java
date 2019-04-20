@@ -17,7 +17,14 @@ package com.dinstone.vertx.web;
 
 import io.vertx.ext.web.RoutingContext;
 
+/**
+ * exception handler
+ * 
+ * @author dinstone
+ *
+ * @param <T>
+ */
 public interface ExceptionHandler<T extends Throwable> {
 
-    void handle(T t, RoutingContext context);
+	void handle(T t, RoutingContext context);
 }
