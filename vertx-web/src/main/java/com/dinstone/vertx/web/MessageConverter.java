@@ -13,15 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dinstone.vertx.web.annotation;
+package com.dinstone.vertx.web;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import java.io.IOException;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
-public @interface Put {
-	String value() default "";
+import io.vertx.ext.web.RoutingContext;
+
+/**
+ * coverter request message or response message by media type
+ * 
+ * @author dinstone
+ *
+ * @param <T>
+ */
+public interface MessageConverter<T> {
+
+	public String mediaType();
+
+	public T read(Class<? extends T> clazz, RoutingContext context) throws Exception;
+
+	void write(T result, RoutingContext context) throws IOException;
 }

@@ -15,73 +15,121 @@
  */
 package com.dinstone.vertx.web;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.dinstone.vertx.web.resolver.AnnotationRouteResolver;
+import com.dinstone.vertx.web.annotation.WebHandler;
+import com.dinstone.vertx.web.core.AnnotationRouteResolver;
+import com.dinstone.vertx.web.core.JsonMessageConverter;
+import com.dinstone.vertx.web.core.RouterContext;
 
+import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
+import io.vertx.ext.web.RoutingContext;
 
+/**
+ * builde router for web handler
+ * 
+ * @author dinstone
+ *
+ */
 public interface RouterBuilder {
 
-    class DefaultRouterBuilder implements RouterBuilder {
+	class DefaultRouterBuilder implements RouterBuilder {
+		private final List<Object> handlers = new ArrayList<>();
+		private final List<RouteResolver> resolvers = new ArrayList<>();
+		private final RouterContext routerContext = new RouterContext();
 
-        private final List<Object> services = new ArrayList<>();
+		private Router router;
 
-        private final List<RouteResolver> resolvers = new ArrayList<>();
+		public DefaultRouterBuilder(Vertx vertx) {
+			router = Router.router(vertx);
 
-        private Router router;
+			converter(new JsonMessageConverter());
+			resolver(new AnnotationRouteResolver());
+		}
 
-        public DefaultRouterBuilder(Vertx vertx) {
-            router = Router.router(vertx);
-            resolver(new AnnotationRouteResolver());
-        }
+		@Override
+		public RouterBuilder handler(Object handler) {
+			if (handler != null) {
+				if (handler instanceof ExceptionHandler) {
+					routerContext.addExceptionHandler((ExceptionHandler<?>) handler);
+				} else {
+					handlers.add(handler);
+				}
+			}
 
-        @Override
-        public RouterBuilder handler(Object service) {
-            if (service != null) {
-                services.add(service);
-            }
+			return this;
+		}
 
-            return this;
-        }
+		@Override
+		public RouterBuilder converter(MessageConverter<?> converter) {
+			if (converter != null) {
+				routerContext.addMessageConverter(converter);
+			}
+			return this;
+		}
 
-        @Override
-        public RouterBuilder resolver(RouteResolver resolver) {
-            if (resolver != null) {
-                this.resolvers.add(resolver);
-            }
-            return this;
-        }
+		@Override
+		public RouterBuilder resolver(RouteResolver resolver) {
+			if (resolver != null) {
+				this.resolvers.add(resolver);
+			}
+			return this;
+		}
 
-        @Override
-        public Router build() {
-            for (Object service : services) {
-                process(router, service);
-            }
+		@SuppressWarnings("unchecked")
+		@Override
+		public Router build() {
+			for (Object handler : handlers) {
+				if (handler instanceof Handler) {
+					router.route().handler((Handler<RoutingContext>) handler);
+					continue;
+				}
 
-            return router;
-        }
+				for (RouteResolver resolver : resolvers) {
+					resolver.resolve(routerContext, router, handler);
+				}
+			}
 
-        private void process(Router router, Object service) {
-            final Class<?> clazz = service.getClass();
-            for (final Method method : clazz.getMethods()) {
-                for (RouteResolver resolver : resolvers) {
-                    resolver.process(router, service, clazz, method);
-                }
-            }
-        }
-    }
+			return router;
+		}
 
-    public static RouterBuilder create(Vertx vertx) {
-        return new DefaultRouterBuilder(vertx);
-    }
+	}
 
-    public RouterBuilder resolver(RouteResolver resolver);
+	public static RouterBuilder create(Vertx vertx) {
+		return new DefaultRouterBuilder(vertx);
+	}
 
-    public RouterBuilder handler(Object handler);
+	/**
+	 * and {@link MessageConverter}
+	 * 
+	 * @param converter
+	 * @return
+	 */
+	public RouterBuilder converter(MessageConverter<?> converter);
 
-    public Router build();
+	/**
+	 * add custome route resolver
+	 * 
+	 * @param resolver
+	 * @return
+	 */
+	public RouterBuilder resolver(RouteResolver resolver);
+
+	/**
+	 * add {@link WebHandler} or {@link ExceptionHandler} or {@link Handler} object
+	 * 
+	 * @param handler
+	 * @return
+	 */
+	public RouterBuilder handler(Object handler);
+
+	/**
+	 * parse route definition and build router
+	 * 
+	 * @return
+	 */
+	public Router build();
 }

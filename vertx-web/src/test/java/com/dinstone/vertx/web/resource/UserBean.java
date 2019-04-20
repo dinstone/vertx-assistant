@@ -15,15 +15,44 @@
  */
 package com.dinstone.vertx.web.resource;
 
-import com.dinstone.vertx.web.annotation.Context;
-import com.dinstone.vertx.web.annotation.Get;
-import com.dinstone.vertx.web.annotation.WebHandler;
+public class UserBean {
 
-import io.vertx.ext.web.RoutingContext;
+    private String name;
+    private int age;
+    private boolean sex;
 
-@WebHandler("/foo")
-public interface FooResource {
+    public UserBean() {
+        super();
+    }
 
-    @Get
-    public void g(@Context RoutingContext ctx);
+    public UserBean(String name, int age, boolean sex) {
+        this.name = name;
+        this.age = age;
+        this.sex = sex;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public int getAge() {
+        return age;
+    }
+
+    public void setAge(int age) {
+        this.age = age;
+    }
+
+    public boolean isSex() {
+        return sex;
+    }
+
+    public void setSex(boolean sex) {
+        this.sex = sex;
+    }
+
 }

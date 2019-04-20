@@ -22,11 +22,11 @@ import org.springframework.context.ApplicationContext;
 
 import com.dinstone.vertx.starter.config.VertxRestProperties;
 import com.dinstone.vertx.web.RouterBuilder;
-import com.dinstone.vertx.web.annotation.Handler;
-import com.dinstone.vertx.web.annotation.Interceptor;
+import com.dinstone.vertx.web.annotation.WebHandler;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;
@@ -37,89 +37,89 @@ import io.vertx.ext.web.handler.TimeoutHandler;
 
 public class HttpRestVerticle extends AbstractVerticle {
 
-    private static final Logger LOG = LoggerFactory.getLogger(HttpRestVerticle.class);
+	private static final Logger LOG = LoggerFactory.getLogger(HttpRestVerticle.class);
 
-    private VertxRestProperties restProperties;
+	private VertxRestProperties restProperties;
 
-    private ApplicationContext applicationContext;
+	private ApplicationContext applicationContext;
 
-    @Override
-    public void start(Future<Void> startFuture) throws Exception {
-        Router mainRouter = Router.router(vertx);
+	@Override
+	public void start(Future<Void> startFuture) throws Exception {
+		Router mainRouter = Router.router(vertx);
 
-        mainRouter.route().failureHandler(ErrorHandler.create(false));
-        mainRouter.route().handler(LoggerHandler.create());
-        mainRouter.route().handler(CookieHandler.create());
-        mainRouter.route().handler(BodyHandler.create());
-        long timeout = restProperties.getTimeout();
-        if (timeout > 0) {
-            mainRouter.route().handler(TimeoutHandler.create(timeout));
-        }
+		mainRouter.route().failureHandler(ErrorHandler.create(false));
+		mainRouter.route().handler(LoggerHandler.create());
+		mainRouter.route().handler(CookieHandler.create());
+		mainRouter.route().handler(BodyHandler.create());
+		long timeout = restProperties.getTimeout();
+		if (timeout > 0) {
+			mainRouter.route().handler(TimeoutHandler.create(timeout));
+		}
 
-        // create router and build rest handler
-        RouterBuilder routerBuilder = RouterBuilder.create(vertx);
-        applicationContext.getBeansWithAnnotation(Interceptor.class).forEach((k, v) -> {
-            LOG.debug("bind rest interceptor {}", v.getClass());
-            routerBuilder.handler(v);
-        });
-        applicationContext.getBeansWithAnnotation(Handler.class).forEach((k, v) -> {
-            LOG.debug("bind rest handler {}", v.getClass());
-            routerBuilder.handler(v);
-        });
-        mainRouter.mountSubRouter(getContextPath(), routerBuilder.build());
+		// create router and build rest handler
+		RouterBuilder routerBuilder = RouterBuilder.create(vertx);
+		applicationContext.getBeansOfType(Handler.class).forEach((k, v) -> {
+			LOG.debug("bind rest interceptor {}", v.getClass());
+			routerBuilder.handler(v);
+		});
+		applicationContext.getBeansWithAnnotation(WebHandler.class).forEach((k, v) -> {
+			LOG.debug("bind rest handler {}", v.getClass());
+			routerBuilder.handler(v);
+		});
+		mainRouter.mountSubRouter(getContextPath(), routerBuilder.build());
 
-        HttpServerOptions serverOptions = getRestHttpServerOptions();
-        vertx.createHttpServer(serverOptions).requestHandler(mainRouter::accept).listen(ar -> {
-            if (ar.succeeded()) {
-                LOG.info("start http rest success on {}:{}", serverOptions.getHost(), serverOptions.getPort());
-                startFuture.complete();
-            } else {
-                LOG.error("start http rest failed on {}:{}", serverOptions.getHost(), serverOptions.getPort());
-                startFuture.fail(ar.cause());
-            }
-        });
-    }
+		HttpServerOptions serverOptions = getRestHttpServerOptions();
+		vertx.createHttpServer(serverOptions).requestHandler(mainRouter::accept).listen(ar -> {
+			if (ar.succeeded()) {
+				LOG.info("start http rest success on {}:{}", serverOptions.getHost(), serverOptions.getPort());
+				startFuture.complete();
+			} else {
+				LOG.error("start http rest failed on {}:{}", serverOptions.getHost(), serverOptions.getPort());
+				startFuture.fail(ar.cause());
+			}
+		});
+	}
 
-    private HttpServerOptions getRestHttpServerOptions() {
-        HttpServerOptions serverOptions = null;
-        try {
-            serverOptions = applicationContext.getBean("restHttpServerOptions", HttpServerOptions.class);
-        } catch (Exception e) {
-            // ignore
-        }
-        if (serverOptions == null) {
-            serverOptions = new HttpServerOptions();
-        }
+	private HttpServerOptions getRestHttpServerOptions() {
+		HttpServerOptions serverOptions = null;
+		try {
+			serverOptions = applicationContext.getBean("restHttpServerOptions", HttpServerOptions.class);
+		} catch (Exception e) {
+			// ignore
+		}
+		if (serverOptions == null) {
+			serverOptions = new HttpServerOptions();
+		}
 
-        serverOptions.setIdleTimeout(restProperties.getIdleTimeout());
-        serverOptions.setPort(restProperties.getPort());
+		serverOptions.setIdleTimeout(restProperties.getIdleTimeout());
+		serverOptions.setPort(restProperties.getPort());
 
-        if (restProperties.getHost() != null) {
-            serverOptions.setHost(restProperties.getHost());
-        }
-        return serverOptions;
-    }
+		if (restProperties.getHost() != null) {
+			serverOptions.setHost(restProperties.getHost());
+		}
+		return serverOptions;
+	}
 
-    private String getContextPath() {
-        String contextPath = restProperties.getContextPath();
-        if (contextPath == null || contextPath.isEmpty()) {
-            contextPath = "/";
-        } else {
-            contextPath.trim();
-        }
+	private String getContextPath() {
+		String contextPath = restProperties.getContextPath();
+		if (contextPath == null || contextPath.isEmpty()) {
+			contextPath = "/";
+		} else {
+			contextPath.trim();
+		}
 
-        if (!contextPath.startsWith("/")) {
-            contextPath = "/" + contextPath;
-        }
-        return contextPath;
-    }
+		if (!contextPath.startsWith("/")) {
+			contextPath = "/" + contextPath;
+		}
+		return contextPath;
+	}
 
-    public void setRestProperties(VertxRestProperties restProperties) {
-        this.restProperties = restProperties;
-    }
+	public void setRestProperties(VertxRestProperties restProperties) {
+		this.restProperties = restProperties;
+	}
 
-    public void setApplicationContext(ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
+	public void setApplicationContext(ApplicationContext applicationContext) {
+		this.applicationContext = applicationContext;
+	}
 
 }

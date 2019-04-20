@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.dinstone.vertx.web.annotation;
+package com.dinstone.vertx.web;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+import io.vertx.ext.web.RoutingContext;
 
-@Retention(RetentionPolicy.RUNTIME)
-@Target({ ElementType.METHOD })
-public @interface Put {
-	String value() default "";
+/**
+ * exception handler
+ * 
+ * @author dinstone
+ *
+ * @param <T>
+ */
+public interface ExceptionHandler<T extends Throwable> {
+
+	void handle(T t, RoutingContext context);
 }

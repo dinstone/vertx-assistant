@@ -23,6 +23,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 
 import com.dinstone.vertx.web.RouteResolver;
+import com.dinstone.vertx.web.core.RouterContext;
 
 import io.vertx.core.Handler;
 import io.vertx.ext.web.Router;
@@ -32,7 +33,6 @@ public class MethodNameRouteResolver implements RouteResolver {
 
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
 
-    @Override
     public void process(Router router, Object instance, Class<?> clazz, Method method) {
         MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
         if (methodHandle != null) {
@@ -99,5 +99,11 @@ public class MethodNameRouteResolver implements RouteResolver {
             }
         };
     }
+
+	@Override
+	public void resolve(RouterContext converters, Router router, Object service) {
+		// TODO Auto-generated method stub
+		
+	}
 
 }

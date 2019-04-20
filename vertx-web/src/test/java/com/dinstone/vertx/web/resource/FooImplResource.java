@@ -15,19 +15,18 @@
  */
 package com.dinstone.vertx.web.resource;
 
+import com.dinstone.vertx.web.annotation.Context;
 import com.dinstone.vertx.web.annotation.Get;
-import com.dinstone.vertx.web.annotation.Handler;
-import com.dinstone.vertx.web.annotation.Path;
+import com.dinstone.vertx.web.annotation.WebHandler;
 
 import io.vertx.ext.web.RoutingContext;
 
-@Handler
-@Path("/foo")
+@WebHandler("/foo")
 public class FooImplResource implements FooResource {
 
 	@Override
 	@Get("/impl")
-	public void g(RoutingContext ctx) {
+	public void g(@Context RoutingContext ctx) {
 		ctx.response().end("Hello foo!");
 	}
 

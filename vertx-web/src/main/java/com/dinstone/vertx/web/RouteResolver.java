@@ -15,12 +15,18 @@
  */
 package com.dinstone.vertx.web;
 
-import java.lang.reflect.Method;
+import com.dinstone.vertx.web.core.RouterContext;
 
 import io.vertx.ext.web.Router;
 
+/**
+ * resolve route definition and build route handler
+ * 
+ * @author dinstone
+ *
+ */
 public interface RouteResolver {
 
-    void process(Router router, Object instance, Class<?> clazz, Method method);
+	void resolve(RouterContext context, Router router, Object handler);
 
 }

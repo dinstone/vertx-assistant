@@ -22,10 +22,10 @@ import org.springframework.context.ApplicationContext;
 
 import com.dinstone.vertx.starter.config.VertxManageProperties;
 import com.dinstone.vertx.web.RouterBuilder;
-import com.dinstone.vertx.web.annotation.Handler;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Future;
+import io.vertx.core.Handler;
 import io.vertx.core.http.HttpServerOptions;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.handler.BodyHandler;

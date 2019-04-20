@@ -30,7 +30,7 @@ public class RouteResolverExample {
         Router apiRouter = builder.handler(new HelloResource()).build();
 
         Router router = Router.router(vertx).mountSubRouter("/api", apiRouter);
-        vertx.createHttpServer().requestHandler(router::accept).listen(8080);
+        vertx.createHttpServer().requestHandler(router).listen(8080);
 
         System.out.println("server work on 8080");
         System.out.println("access url: http://localhost:8080/api/HelloResource/get");

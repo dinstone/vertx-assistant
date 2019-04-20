@@ -16,13 +16,11 @@
 package com.dinstone.vertx.web.resource;
 
 import com.dinstone.vertx.web.annotation.Consumes;
-import com.dinstone.vertx.web.annotation.Handler;
 import com.dinstone.vertx.web.annotation.Produces;
 
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.web.RoutingContext;
 
-@Handler
 public class HelloResourceSubclass extends HelloResource{
 
     public void g(RoutingContext ctx) {
