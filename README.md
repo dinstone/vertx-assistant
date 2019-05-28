@@ -10,7 +10,7 @@ vertx-web maven description :
 <dependency>
     <groupId>com.dinstone.vertx</groupId>
     <artifactId>vertx-web-assistant</artifactId>
-    <version>2.2.0</version>
+    <version>2.4.0</version>
 </dependency>
 ```
 
@@ -20,6 +20,6 @@ vertx-starter maven description :
 <dependency>
     <groupId>com.dinstone.vertx</groupId>
     <artifactId>vertx-spring-boot-starter</artifactId>
-    <version>1.0.0</version>
+    <version>1.2.0</version>
 </dependency>
 ```
