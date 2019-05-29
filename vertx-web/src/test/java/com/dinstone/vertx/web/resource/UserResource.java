@@ -73,9 +73,8 @@ public class UserResource {
 	}
 
 	@Get("/regp/(?<name>[^\\/]+)/(?<nick>[^\\/]+)")
-	public Void regp(@Context RoutingContext context, @PathParam("name") String name, @PathParam("nick") String nick) {
+	public void regp(@Context RoutingContext context, @PathParam("name") String name, @PathParam("nick") String nick) {
 		context.response().end("OK");
 
-		return null;
 	}
 }
