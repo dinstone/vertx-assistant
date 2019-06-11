@@ -26,6 +26,10 @@ import io.vertx.ext.web.RoutingContext;
 
 public class DefaultExceptionHandler implements ExceptionHandler<Throwable> {
 
+    private static final String CONTENT_TYPE_KEY = "Content-Type";
+
+    private static final String CONTENT_TYPE_VALUE = "application/json;charset=UTF-8";
+
     @Override
     public void handle(Throwable t, RoutingContext context) {
         Map<String, Object> res = new LinkedHashMap<>();
@@ -38,6 +42,7 @@ public class DefaultExceptionHandler implements ExceptionHandler<Throwable> {
         }
 
         HttpServerResponse response = context.response();
+        response.putHeader(CONTENT_TYPE_KEY, CONTENT_TYPE_VALUE);
         response.setStatusCode(500).end(Json.encodeToBuffer(res));
     }
 

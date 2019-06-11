@@ -84,8 +84,10 @@ public abstract class AbstractRouteResolver implements RouteResolver {
             }
 
             Handler<RoutingContext> handler;
-            if (isAsyncType(definition.getReturnType())) {
-                handler = asyncHandler(service, definition, routerContext);
+            if (isVoid(definition.getReturnType())) {
+                handler = voidHandler(service, definition, routerContext);
+            } else if (isFuture(definition.getReturnType())) {
+                handler = futureHandler(service, definition, routerContext);
             } else {
                 handler = blockHandler(service, definition, routerContext);
             }
@@ -96,7 +98,26 @@ public abstract class AbstractRouteResolver implements RouteResolver {
 
     protected abstract List<RouteDefinition> parseRouteDefinitions(Object service);
 
-    private static Handler<RoutingContext> asyncHandler(final Object service, final RouteDefinition definition,
+    private static Handler<RoutingContext> voidHandler(final Object service, final RouteDefinition definition,
+            RouterContext routerContext) {
+
+        return context -> {
+            try {
+                Object[] args = prepareArguments(context, definition, routerContext);
+
+                String acceptableContentType = context.getAcceptableContentType();
+                if (acceptableContentType != null) {
+                    context.response().putHeader("Content-Type", acceptableContentType);
+                }
+
+                definition.getMethod().invoke(service, args);
+            } catch (Throwable e) {
+                handleException(e, context, definition, routerContext);
+            }
+        };
+    }
+
+    private static Handler<RoutingContext> futureHandler(final Object service, final RouteDefinition definition,
             RouterContext routerContext) {
 
         return context -> {
@@ -104,22 +125,19 @@ public abstract class AbstractRouteResolver implements RouteResolver {
                 Object[] args = prepareArguments(context, definition, routerContext);
                 Object result = definition.getMethod().invoke(service, args);
 
-                if (result instanceof Future) {
-                    Future<?> future = (Future<?>) result;
-                    // wait for future to complete ... don't block vertx event bus in the mean time
-                    future.setHandler(handler -> {
-                        if (future.succeeded()) {
-                            try {
-                                Object futureResult = future.result();
-                                handleResponse(futureResult, context, definition, routerContext);
-                            } catch (Throwable e) {
-                                handleException(e, context, definition, routerContext);
-                            }
-                        } else {
-                            handleException(future.cause(), context, definition, routerContext);
+                Future<?> future = (Future<?>) result;
+                // wait for future to complete
+                future.setHandler(handler -> {
+                    if (future.succeeded()) {
+                        try {
+                            handleResponse(future.result(), context, definition, routerContext);
+                        } catch (Throwable e) {
+                            handleException(e, context, definition, routerContext);
                         }
-                    });
-                }
+                    } else {
+                        handleException(future.cause(), context, definition, routerContext);
+                    }
+                });
             } catch (Throwable e) {
                 handleException(e, context, definition, routerContext);
             }
@@ -140,8 +158,7 @@ public abstract class AbstractRouteResolver implements RouteResolver {
         }, false, res -> {
             if (res.succeeded()) {
                 try {
-                    Object result = res.result();
-                    handleResponse(result, context, definition, routerContext);
+                    handleResponse(res.result(), context, definition, routerContext);
                 } catch (Throwable e) {
                     handleException(e, context, definition, routerContext);
                 }
@@ -179,7 +196,8 @@ public abstract class AbstractRouteResolver implements RouteResolver {
         LOG.error("handling exception for " + definition, e);
 
         try {
-            ExceptionHandler<Throwable> handler = (ExceptionHandler<Throwable>) routerContext.getExceptionHandler(e.getClass());
+            ExceptionHandler<Throwable> handler = (ExceptionHandler<Throwable>) routerContext
+                    .getExceptionHandler(e.getClass());
             handler.handle(e, context);
         } catch (Throwable ex) {
             LOG.warn("handled exception failed : " + ex.getMessage(), e);
@@ -292,10 +310,6 @@ public abstract class AbstractRouteResolver implements RouteResolver {
     private static Object convertBean(RouteDefinition definition, RoutingContext context, Argument parameter,
             RouterContext routerContext) throws Exception {
         String contentType = context.request().getHeader("Content-Type");
-        if (contentType != null) {
-            contentType = contentType.split(";", 2)[0];
-        }
-
         MessageConverter<Object> converter = routerContext.getMessageConverter(contentType);
         if (converter == null) {
             converter = routerContext.getMessageConverter(definition.getConsumes());
@@ -340,10 +354,6 @@ public abstract class AbstractRouteResolver implements RouteResolver {
         }
 
         throw new RuntimeException("can't provide @Context of type: " + paramClazz);
-    }
-
-    private static boolean isAsyncType(Class<?> returnType) {
-        return isVoid(returnType) || isFuture(returnType);
     }
 
     private static boolean isFuture(Class<?> returnType) {

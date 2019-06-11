@@ -25,6 +25,8 @@ import java.util.Map.Entry;
 import com.dinstone.vertx.web.ExceptionHandler;
 import com.dinstone.vertx.web.MessageConverter;
 
+import io.vertx.ext.web.impl.ParsableMIMEValue;
+
 public class RouterContext {
 
     private final ExceptionHandler<Throwable> defaultExceptionHandler = new DefaultExceptionHandler();
@@ -37,6 +39,7 @@ public class RouterContext {
     public <T> MessageConverter<T> getMessageConverter(String... mediaTypes) {
         if (mediaTypes != null) {
             for (String mediaType : mediaTypes) {
+                mediaType = new ParsableMIMEValue(mediaType).forceParse().value();
                 MessageConverter<?> converter = messageConverters.get(mediaType);
                 if (converter != null) {
                     return (MessageConverter<T>) converter;
@@ -48,7 +51,8 @@ public class RouterContext {
 
     public void addMessageConverter(MessageConverter<?>... converters) {
         for (MessageConverter<?> converter : converters) {
-            messageConverters.put(converter.mediaType(), converter);
+            String mediaType = new ParsableMIMEValue(converter.mediaType()).forceParse().value();
+            messageConverters.put(mediaType, converter);
         }
     }
 
@@ -82,7 +86,7 @@ public class RouterContext {
                 return genericTypes[0];
             }
         }
-    
+
         return null;
     }
 
