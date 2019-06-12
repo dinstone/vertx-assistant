@@ -19,10 +19,10 @@ import java.io.IOException;
 import java.net.URLDecoder;
 
 import com.dinstone.vertx.web.MessageConverter;
-import com.dinstone.vertx.web.core.MediaType;
 
 import io.vertx.core.MultiMap;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.impl.ParsableHeaderValue;
 
 public class FormMessageConverter implements MessageConverter<MultiMap> {
 
@@ -40,7 +40,10 @@ public class FormMessageConverter implements MessageConverter<MultiMap> {
         String charset = null;
         String contentType = context.request().getHeader("Content-Type");
         if (contentType != null) {
-            charset = MediaType.parse(contentType).charset(defaultCharset);
+            charset = new ParsableHeaderValue(contentType).forceParse().parameter("charset");
+        }
+        if (charset == null) {
+            charset = defaultCharset;
         }
 
         String body = context.getBodyAsString(charset);
