@@ -25,7 +25,7 @@ import io.vertx.ext.web.RoutingContext;
 
 public class JsonMessageConverter implements MessageConverter<Object> {
 
-    private String mediaType = "application/json;charset=UTF-8";
+    private String mediaType = "application/json; charset=UTF-8";
 
     @Override
     public Object read(Class<? extends Object> clazz, RoutingContext context) throws IOException {

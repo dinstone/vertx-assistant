@@ -49,7 +49,7 @@ public class UserResourceTest {
 					.putHeader("Content-Type", "application/x-www-form-urlencoded").exceptionHandler(ctx::fail)
 					.handler(res -> {
 						ctx.assertEquals(200, res.statusCode());
-						ctx.assertEquals("application/json", res.getHeader("Content-Type"));
+						ctx.assertEquals("application/json; charset=UTF-8", res.getHeader("Content-Type"));
 
 						res.bodyHandler(buff -> {
 							JsonObject uo = buff.toJsonObject();
@@ -90,7 +90,7 @@ public class UserResourceTest {
 			httpClient.post(8081, "localhost", "/ur/bm").putHeader("Content-Type", "application/x-www-form-urlencoded")
 					.exceptionHandler(ctx::fail).handler(res -> {
 						ctx.assertEquals(200, res.statusCode());
-						ctx.assertEquals("application/json", res.getHeader("Content-Type"));
+						ctx.assertEquals("application/json; charset=UTF-8", res.getHeader("Content-Type"));
 
 						res.bodyHandler(buff -> {
 							JsonObject uo = buff.toJsonObject();
@@ -136,7 +136,7 @@ public class UserResourceTest {
 			httpClient.post(8081, "localhost", "/ur/bp").putHeader("Content-Type", "application/json")
 					.exceptionHandler(ctx::fail).handler(res -> {
 						ctx.assertEquals(200, res.statusCode());
-						ctx.assertEquals("application/json", res.getHeader("Content-Type"));
+						ctx.assertEquals("application/json; charset=UTF-8", res.getHeader("Content-Type"));
 
 						res.bodyHandler(buff -> {
 							String a = buff.toString();
@@ -225,7 +225,7 @@ public class UserResourceTest {
 			httpClient.post(8081, "localhost", "/ur/bpf").putHeader("Content-Type", "application/json")
 					.exceptionHandler(ctx::fail).handler(res -> {
 						ctx.assertEquals(200, res.statusCode());
-						ctx.assertEquals("application/json", res.getHeader("Content-Type"));
+						ctx.assertEquals("application/json; charset=UTF-8", res.getHeader("Content-Type"));
 
 						res.bodyHandler(buff -> {
 							JsonObject uo = buff.toJsonObject();

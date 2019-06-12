@@ -28,7 +28,7 @@ public class DefaultExceptionHandler implements ExceptionHandler<Throwable> {
 
     private static final String CONTENT_TYPE_KEY = "Content-Type";
 
-    private static final String CONTENT_TYPE_VALUE = "application/json;charset=UTF-8";
+    private static final String CONTENT_TYPE_VALUE = "application/json; charset=UTF-8";
 
     @Override
     public void handle(Throwable t, RoutingContext context) {
