@@ -28,6 +28,7 @@ import com.dinstone.vertx.web.annotation.WebHandler;
 
 import io.vertx.core.Future;
 import io.vertx.core.MultiMap;
+import io.vertx.core.Promise;
 import io.vertx.ext.web.RoutingContext;
 
 @WebHandler("/ur")
@@ -52,9 +53,9 @@ public class UserResource {
 
 	@Post("/bpf")
 	public Future<UserBean> bpf(@BeanParam UserBean user) {
-		Future<UserBean> future = Future.future();
+		Promise<UserBean> future = Promise.promise();
 		future.complete(user);
-		return future;
+		return future.future();
 	}
 
 	@Get("/vfn")

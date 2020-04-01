@@ -47,11 +47,12 @@ public class UserResourceTest {
 			HttpClient httpClient = vertx.createHttpClient();
 			httpClient.post(8081, "localhost", "/ur/c/dinstone?age=34")
 					.putHeader("Content-Type", "application/x-www-form-urlencoded").exceptionHandler(ctx::fail)
-					.handler(res -> {
-						ctx.assertEquals(200, res.statusCode());
-						ctx.assertEquals("application/json; charset=UTF-8", res.getHeader("Content-Type"));
+					.setHandler(res -> {
+						ctx.assertTrue(res.succeeded());
+						ctx.assertEquals(200, res.result().statusCode());
+						ctx.assertEquals("application/json; charset=UTF-8", res.result().getHeader("Content-Type"));
 
-						res.bodyHandler(buff -> {
+						res.result().bodyHandler(buff -> {
 							JsonObject uo = buff.toJsonObject();
 							ctx.assertEquals("dinstone", uo.getString("name"));
 							ctx.assertEquals(34, uo.getInteger("age"));
@@ -88,11 +89,11 @@ public class UserResourceTest {
 
 			HttpClient httpClient = vertx.createHttpClient();
 			httpClient.post(8081, "localhost", "/ur/bm").putHeader("Content-Type", "application/x-www-form-urlencoded")
-					.exceptionHandler(ctx::fail).handler(res -> {
-						ctx.assertEquals(200, res.statusCode());
-						ctx.assertEquals("application/json; charset=UTF-8", res.getHeader("Content-Type"));
+					.exceptionHandler(ctx::fail).setHandler(res -> {
+						ctx.assertEquals(200, res.result().statusCode());
+						ctx.assertEquals("application/json; charset=UTF-8", res.result().getHeader("Content-Type"));
 
-						res.bodyHandler(buff -> {
+						res.result().bodyHandler(buff -> {
 							JsonObject uo = buff.toJsonObject();
 							ctx.assertEquals("superman", uo.getString("name"));
 							ctx.assertEquals(34, uo.getInteger("age"));
@@ -134,11 +135,11 @@ public class UserResourceTest {
 
 			HttpClient httpClient = vertx.createHttpClient();
 			httpClient.post(8081, "localhost", "/ur/bp").putHeader("Content-Type", "application/json")
-					.exceptionHandler(ctx::fail).handler(res -> {
-						ctx.assertEquals(200, res.statusCode());
-						ctx.assertEquals("application/json; charset=UTF-8", res.getHeader("Content-Type"));
+					.exceptionHandler(ctx::fail).setHandler(res -> {
+						ctx.assertEquals(200, res.result().statusCode());
+						ctx.assertEquals("application/json; charset=UTF-8", res.result().getHeader("Content-Type"));
 
-						res.bodyHandler(buff -> {
+						res.result().bodyHandler(buff -> {
 							String a = buff.toString();
 							ctx.assertEquals("28", a);
 
@@ -179,11 +180,11 @@ public class UserResourceTest {
 
 			HttpClient httpClient = vertx.createHttpClient();
 			httpClient.post(8081, "localhost", "/ur/bp").putHeader("Content-Type", "application/json")
-					.exceptionHandler(ctx::fail).handler(res -> {
-						ctx.assertEquals(500, res.statusCode());
+					.exceptionHandler(ctx::fail).setHandler(res -> {
+						ctx.assertEquals(500, res.result().statusCode());
 						// ctx.assertEquals("application/json", res.getHeader("Content-Type"));
 
-						res.bodyHandler(buff -> {
+						res.result().bodyHandler(buff -> {
 							String a = buff.toString();
 							// ctx.assertEquals("28", a);
 
@@ -223,11 +224,11 @@ public class UserResourceTest {
 
 			HttpClient httpClient = vertx.createHttpClient();
 			httpClient.post(8081, "localhost", "/ur/bpf").putHeader("Content-Type", "application/json")
-					.exceptionHandler(ctx::fail).handler(res -> {
-						ctx.assertEquals(200, res.statusCode());
-						ctx.assertEquals("application/json; charset=UTF-8", res.getHeader("Content-Type"));
+					.exceptionHandler(ctx::fail).setHandler(res -> {
+						ctx.assertEquals(200, res.result().statusCode());
+						ctx.assertEquals("application/json; charset=UTF-8", res.result().getHeader("Content-Type"));
 
-						res.bodyHandler(buff -> {
+						res.result().bodyHandler(buff -> {
 							JsonObject uo = buff.toJsonObject();
 							ctx.assertEquals("akala", uo.getString("name"));
 							ctx.assertEquals(28, uo.getInteger("age"));
@@ -266,9 +267,9 @@ public class UserResourceTest {
 
 			HttpClient httpClient = vertx.createHttpClient();
 			long st = System.currentTimeMillis();
-			httpClient.get(8081, "localhost", "/ur/vfn").exceptionHandler(ctx::fail).handler(res -> {
-				ctx.assertEquals(200, res.statusCode());
-				res.bodyHandler(buff -> {
+			httpClient.get(8081, "localhost", "/ur/vfn").exceptionHandler(ctx::fail).setHandler(res -> {
+				ctx.assertEquals(200, res.result().statusCode());
+				res.result().bodyHandler(buff -> {
 					ctx.assertEquals("OK", buff.toString());
 
 					long et = System.currentTimeMillis();
@@ -305,9 +306,9 @@ public class UserResourceTest {
 
 			HttpClient httpClient = vertx.createHttpClient();
 			long st = System.currentTimeMillis();
-			httpClient.get(8081, "localhost", "/ur/reg/gjf/dinstone").exceptionHandler(ctx::fail).handler(res -> {
-				ctx.assertEquals(200, res.statusCode());
-				res.bodyHandler(buff -> {
+			httpClient.get(8081, "localhost", "/ur/reg/gjf/dinstone").exceptionHandler(ctx::fail).setHandler(res -> {
+				ctx.assertEquals(200, res.result().statusCode());
+				res.result().bodyHandler(buff -> {
 					ctx.assertEquals("OK", buff.toString());
 
 					long et = System.currentTimeMillis();
@@ -344,9 +345,9 @@ public class UserResourceTest {
 
 			HttpClient httpClient = vertx.createHttpClient();
 			long st = System.currentTimeMillis();
-			httpClient.get(8081, "localhost", "/ur/regp/gjf/dinstone").exceptionHandler(ctx::fail).handler(res -> {
-				ctx.assertEquals(200, res.statusCode());
-				res.bodyHandler(buff -> {
+			httpClient.get(8081, "localhost", "/ur/regp/gjf/dinstone").exceptionHandler(ctx::fail).setHandler(res -> {
+				ctx.assertEquals(200, res.result().statusCode());
+				res.result().bodyHandler(buff -> {
 					ctx.assertEquals("OK", buff.toString());
 
 					long et = System.currentTimeMillis();
