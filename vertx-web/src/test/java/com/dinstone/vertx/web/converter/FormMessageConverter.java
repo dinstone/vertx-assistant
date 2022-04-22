@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.web.converter;
 
 import java.io.IOException;
@@ -21,6 +22,8 @@ import java.net.URLDecoder;
 import com.dinstone.vertx.web.MessageConverter;
 
 import io.vertx.core.MultiMap;
+import io.vertx.core.buffer.Buffer;
+import io.vertx.core.json.Json;
 import io.vertx.ext.web.RoutingContext;
 import io.vertx.ext.web.impl.ParsableHeaderValue;
 
@@ -46,8 +49,7 @@ public class FormMessageConverter implements MessageConverter<MultiMap> {
             charset = defaultCharset;
         }
 
-        String body = context.getBodyAsString(charset);
-        String[] pairs = body.split("&");
+        String[] pairs = context.getBodyAsString(charset).split("&");
         MultiMap result = MultiMap.caseInsensitiveMultiMap();
         for (String pair : pairs) {
             int idx = pair.indexOf('=');
@@ -69,7 +71,15 @@ public class FormMessageConverter implements MessageConverter<MultiMap> {
 
     @Override
     public void write(MultiMap result, RoutingContext context) throws IOException {
-        // TODO Auto-generated method stub
+        context.response().putHeader("Content-Type", mediaType);
+
+        if (result != null && !result.isEmpty()) {
+            
+            Buffer buffer = Json.encodeToBuffer(result);
+            context.response().end(buffer);
+        } else {
+            context.response().end();
+        }
     }
 
 }

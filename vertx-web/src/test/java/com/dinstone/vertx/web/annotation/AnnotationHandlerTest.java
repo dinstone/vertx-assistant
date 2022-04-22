@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.web.annotation;
 
 import java.lang.reflect.InvocationHandler;
@@ -30,6 +31,8 @@ import com.dinstone.vertx.web.resource.HelloResourceSubclass;
 
 import io.vertx.core.Vertx;
 import io.vertx.core.http.HttpClient;
+import io.vertx.core.http.HttpClientRequest;
+import io.vertx.core.http.HttpMethod;
 import io.vertx.core.json.JsonObject;
 import io.vertx.ext.unit.Async;
 import io.vertx.ext.unit.TestContext;
@@ -40,212 +43,236 @@ import io.vertx.ext.web.RoutingContext;
 @RunWith(VertxUnitRunner.class)
 public class AnnotationHandlerTest {
 
-	private static Vertx vertx = Vertx.vertx();
+    private static Vertx vertx = Vertx.vertx();
 
-	@Test
-	public void testHelloResourceGet(TestContext ctx) {
-		final Async async = ctx.async();
+    @Test
+    public void testHelloResourceGet(TestContext ctx) {
+        final Async async = ctx.async();
 
-		final Router router = RouterBuilder.create(vertx).handler(new HelloResource()).build();
-		vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
-			if (server.failed()) {
-				ctx.fail(server.cause());
-				return;
-			}
+        final Router router = RouterBuilder.create(vertx).handler(new HelloResource()).build();
+        vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
+            if (server.failed()) {
+                ctx.fail(server.cause());
+                return;
+            }
 
-			HttpClient httpClient = vertx.createHttpClient();
-			httpClient.get(8081, "localhost", "/hello/g").exceptionHandler(ctx::fail).setHandler(res -> {
-				ctx.assertTrue(res.succeeded());
-				ctx.assertEquals(200, res.result().statusCode());
-				res.result().bodyHandler(buff -> {
-					ctx.assertEquals("Hello ws!", buff.toString());
+            HttpClient httpClient = vertx.createHttpClient();
+            httpClient.request(HttpMethod.GET, 8081, "localhost", "/hello/g").onComplete(ar -> {
+                if (ar.succeeded()) {
+                    HttpClientRequest req = ar.result();
+                    req.exceptionHandler(ctx::fail);
+                    req.send().onComplete(res -> {
+                        ctx.assertTrue(res.succeeded());
+                        ctx.assertEquals(200, res.result().statusCode());
+                        res.result().bodyHandler(buff -> {
+                            ctx.assertEquals("Hello ws!", buff.toString());
 
-					server.result().close(v -> {
-						if (v.failed()) {
-							ctx.fail(v.cause());
-							return;
-						}
-						async.complete();
-					});
-				});
-			}).end();
-		});
+                            server.result().close(v -> {
+                                if (v.failed()) {
+                                    ctx.fail(v.cause());
+                                    return;
+                                }
+                                async.complete();
+                            });
+                        });
+                    });
+                } else {
+                    ctx.fail(ar.cause());
+                }
+            });
+        });
 
-		async.await();
-	}
+        async.await();
+    }
 
-	@Test
-	public void testHelloResourcePost(TestContext ctx) {
-		final Async async = ctx.async();
+    @Test
+    public void testHelloResourcePost(TestContext ctx) {
+        final Async async = ctx.async();
 
-		final Router router = RouterBuilder.create(vertx).handler(new HelloResource()).build();
-		vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
-			if (server.failed()) {
-				ctx.fail(server.cause());
-				return;
-			}
+        final Router router = RouterBuilder.create(vertx).handler(new HelloResource()).build();
+        vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
+            if (server.failed()) {
+                ctx.fail(server.cause());
+                return;
+            }
 
-			HttpClient httpClient = vertx.createHttpClient();
-			httpClient.post(8081, "localhost", "/hello/p").putHeader("Content-Type", "text/json")
-					.exceptionHandler(ctx::fail).setHandler(res -> {
-						ctx.assertTrue(res.succeeded());
-						ctx.assertEquals(200, res.result().statusCode());
-						ctx.assertEquals("text/plain", res.result().getHeader("Content-Type"));
+            HttpClient httpClient = vertx.createHttpClient();
+            httpClient.request(HttpMethod.POST, 8081, "localhost", "/hello/p").onComplete(ar -> {
+                if (ar.succeeded()) {
+                    HttpClientRequest req = ar.result().putHeader("Content-Type", "text/json");
+                    req.exceptionHandler(ctx::fail);
+                    req.send(new JsonObject().put("content", "ws").toString()).onComplete(res -> {
+                        ctx.assertTrue(res.succeeded());
+                        ctx.assertEquals(200, res.result().statusCode());
+                        ctx.assertEquals("text/plain", res.result().getHeader("Content-Type"));
 
-						res.result().bodyHandler(buff -> {
-							ctx.assertEquals("Hello ws!", buff.toString());
+                        res.result().bodyHandler(buff -> {
+                            ctx.assertEquals("Hello ws!", buff.toString());
 
-							server.result().close(v -> {
-								if (v.failed()) {
-									ctx.fail(v.cause());
-									return;
-								}
-								async.complete();
-							});
-						});
-					}).end(new JsonObject().put("content", "ws").toString());
-		});
+                            server.result().close(v -> {
+                                if (v.failed()) {
+                                    ctx.fail(v.cause());
+                                    return;
+                                }
+                                async.complete();
+                            });
+                        });
+                    });
+                } else {
+                    ctx.fail(ar.cause());
+                }
+            });
+        });
 
-		async.await();
-	}
+        async.await();
+    }
 
-	@Test
-	public void testHelloResourceGetPathParam(TestContext ctx) {
-		final Async async = ctx.async();
+    @Test
+    public void testHelloResourceGetPathParam(TestContext ctx) {
+        final Async async = ctx.async();
 
-		final Router router = RouterBuilder.create(vertx).handler(new HelloResource()).build();
-		vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
-			if (server.failed()) {
-				ctx.fail(server.cause());
-				return;
-			}
+        final Router router = RouterBuilder.create(vertx).handler(new HelloResource()).build();
+        vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
+            if (server.failed()) {
+                ctx.fail(server.cause());
+                return;
+            }
 
-			HttpClient httpClient = vertx.createHttpClient();
-			httpClient.get(8081, "localhost", "/hello/g/vert.x").exceptionHandler(ctx::fail).setHandler(res -> {
-				ctx.assertTrue(res.succeeded());
-				ctx.assertEquals(200, res.result().statusCode());
-				res.result().bodyHandler(buff -> {
-					ctx.assertEquals("hello vert.x", buff.toJsonObject().getString("message"));
+            HttpClient httpClient = vertx.createHttpClient();
+            httpClient.request(HttpMethod.GET, 8081, "localhost", "/hello/g/vert.x").onSuccess(req -> {
+                req.exceptionHandler(ctx::fail).send().onComplete(res -> {
+                    ctx.assertTrue(res.succeeded());
+                    ctx.assertEquals(200, res.result().statusCode());
+                    res.result().bodyHandler(buff -> {
+                        ctx.assertEquals("hello vert.x", buff.toJsonObject().getString("message"));
 
-					server.result().close(v -> {
-						if (v.failed()) {
-							ctx.fail(v.cause());
-							return;
-						}
-						async.complete();
-					});
-				});
-			}).end();
-		});
+                        server.result().close(v -> {
+                            if (v.failed()) {
+                                ctx.fail(v.cause());
+                                return;
+                            }
+                            async.complete();
+                        });
+                    });
+                });
+            }).onFailure(t -> ctx.fail(t));
 
-		async.await();
-	}
+        });
 
-	@Test
-	public void testHelloResourceSubclass(TestContext ctx) {
-		final Async async = ctx.async();
+        async.await();
+    }
 
-		final Router router = RouterBuilder.create(vertx).handler(new HelloResourceSubclass()).build();
-		vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
-			if (server.failed()) {
-				ctx.fail(server.cause());
-				return;
-			}
+    @Test
+    public void testHelloResourceSubclass(TestContext ctx) {
+        final Async async = ctx.async();
 
-			HttpClient httpClient = vertx.createHttpClient();
-			httpClient.get(8081, "localhost", "/hello/g").exceptionHandler(ctx::fail).setHandler(res -> {
-				ctx.assertTrue(res.succeeded());
-				ctx.assertEquals(200, res.result().statusCode());
-				res.result().bodyHandler(buff -> {
-					ctx.assertEquals("Hello ws!", buff.toString());
+        final Router router = RouterBuilder.create(vertx).handler(new HelloResourceSubclass()).build();
+        vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
+            if (server.failed()) {
+                ctx.fail(server.cause());
+                return;
+            }
 
-					server.result().close(v -> {
-						if (v.failed()) {
-							ctx.fail(v.cause());
-							return;
-						}
-						async.complete();
-					});
-				});
-			}).end();
-		});
+            HttpClient httpClient = vertx.createHttpClient();
+            httpClient.request(HttpMethod.GET, 8081, "localhost", "/hello/g").onSuccess(req -> {
+                req.exceptionHandler(ctx::fail).send().onComplete(res -> {
+                    ctx.assertTrue(res.succeeded());
+                    ctx.assertEquals(200, res.result().statusCode());
+                    res.result().bodyHandler(buff -> {
+                        ctx.assertEquals("Hello ws!", buff.toString());
 
-		async.await();
-	}
+                        server.result().close(v -> {
+                            if (v.failed()) {
+                                ctx.fail(v.cause());
+                                return;
+                            }
+                            async.complete();
+                        });
+                    });
+                });
+            }).onFailure(t -> ctx.fail(t));
+        });
 
-	@Test
-	public void testFooResourceImpl(TestContext ctx) {
-		final Async async = ctx.async();
+        async.await();
+    }
 
-		final Router router = RouterBuilder.create(vertx).handler(new FooImplResource()).build();
-		vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
-			if (server.failed()) {
-				ctx.fail(server.cause());
-				return;
-			}
+    @Test
+    public void testFooResourceImpl(TestContext ctx) {
+        final Async async = ctx.async();
 
-			HttpClient httpClient = vertx.createHttpClient();
-			httpClient.get(8081, "localhost", "/foo/impl").exceptionHandler(ctx::fail).setHandler(res -> {
-				ctx.assertTrue(res.succeeded());
-				ctx.assertEquals(200, res.result().statusCode());
-				res.result().bodyHandler(buff -> {
-					ctx.assertEquals("Hello foo!", buff.toString());
+        final Router router = RouterBuilder.create(vertx).handler(new FooImplResource()).build();
+        vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
+            if (server.failed()) {
+                ctx.fail(server.cause());
+                return;
+            }
 
-					server.result().close(v -> {
-						if (v.failed()) {
-							ctx.fail(v.cause());
-							return;
-						}
-						async.complete();
-					});
-				});
-			}).end();
-		});
+            HttpClient httpClient = vertx.createHttpClient();
+            httpClient.request(HttpMethod.GET, 8081, "localhost", "/foo/impl").onSuccess(req -> {
+                req.exceptionHandler(ctx::fail).send().onComplete(res -> {
+                    ctx.assertTrue(res.succeeded());
+                    ctx.assertEquals(200, res.result().statusCode());
+                    res.result().bodyHandler(buff -> {
+                        ctx.assertEquals("Hello foo!", buff.toString());
 
-		async.await();
-	}
+                        server.result().close(v -> {
+                            if (v.failed()) {
+                                ctx.fail(v.cause());
+                                return;
+                            }
+                            async.complete();
+                        });
+                    });
+                });
+            }).onFailure(t -> ctx.fail(t));
+        });
 
-	@Test
-	public void testFooResourceProxy(TestContext ctx) {
-		final Async async = ctx.async();
+        async.await();
+    }
 
-		FooResource handler = (FooResource) Proxy.newProxyInstance(FooResource.class.getClassLoader(),
-				new Class<?>[] { FooResource.class }, new InvocationHandler() {
+    @Test
+    public void testFooResourceProxy(TestContext ctx) {
+        final Async async = ctx.async();
 
-					@Override
-					public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-						RoutingContext ctx = (RoutingContext) args[0];
-						ctx.response().end("Hello proxy!");
-						return null;
-					}
-				});
+        FooResource handler = (FooResource) Proxy.newProxyInstance(FooResource.class.getClassLoader(),
+            new Class<?>[] { FooResource.class }, new InvocationHandler() {
 
-		final Router router = RouterBuilder.create(vertx).handler(handler).build();
-		vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
-			if (server.failed()) {
-				ctx.fail(server.cause());
-				return;
-			}
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                    RoutingContext ctx = (RoutingContext) args[0];
+                    ctx.response().end("Hello proxy!");
+                    return null;
+                }
+            });
 
-			HttpClient httpClient = vertx.createHttpClient();
-			httpClient.get(8081, "localhost", "/foo/g").exceptionHandler(ctx::fail).setHandler(res -> {
-				ctx.assertTrue(res.succeeded());
-				ctx.assertEquals(200, res.result().statusCode());
-				res.result().bodyHandler(buff -> {
-					ctx.assertEquals("Hello proxy!", buff.toString());
+        final Router router = RouterBuilder.create(vertx).handler(handler).build();
+        vertx.createHttpServer().requestHandler(router).listen(8081, server -> {
+            if (server.failed()) {
+                ctx.fail(server.cause());
+                return;
+            }
 
-					server.result().close(v -> {
-						if (v.failed()) {
-							ctx.fail(v.cause());
-							return;
-						}
-						async.complete();
-					});
-				});
-			}).end();
-		});
+            HttpClient httpClient = vertx.createHttpClient();
+            httpClient.request(HttpMethod.GET, 8081, "localhost", "/foo/g").onSuccess(req -> {
+                req.exceptionHandler(ctx::fail).send().onComplete(res -> {
+                    ctx.assertTrue(res.succeeded());
+                    ctx.assertEquals(200, res.result().statusCode());
+                    res.result().bodyHandler(buff -> {
+                        ctx.assertEquals("Hello proxy!", buff.toString());
 
-		async.await();
-	}
+                        server.result().close(v -> {
+                            if (v.failed()) {
+                                ctx.fail(v.cause());
+                                return;
+                            }
+                            async.complete();
+                        });
+                    });
+                });
+            }).onFailure(t -> ctx.fail(t));
+        });
+
+        async.await();
+    }
 
 }

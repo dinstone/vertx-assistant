@@ -13,20 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.dinstone.vertx.starter.config;
 
-package com.dinstone.vertx.starter;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
-import java.lang.annotation.Target;
+@Configuration
+public class VertxWebServerConfiguration {
 
-import org.springframework.context.annotation.Import;
+    class Marker {
+    }
 
-import com.dinstone.vertx.starter.config.VertxConfiguration;
+    @Bean
+    public Marker enableVertxRestMarker() {
+        return new Marker();
+    }
 
-@Target(ElementType.TYPE)
-@Retention(RetentionPolicy.RUNTIME)
-@Import(VertxConfiguration.class)
-public @interface EnableVertx {
 }

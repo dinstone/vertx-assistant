@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.web.resolver;
 
 import com.dinstone.vertx.web.RouterBuilder;
@@ -29,7 +30,8 @@ public class RouteResolverExample {
         RouterBuilder builder = RouterBuilder.create(vertx).resolver(new MethodNameRouteResolver());
         Router apiRouter = builder.handler(new HelloResource()).build();
 
-        Router router = Router.router(vertx).mountSubRouter("/api", apiRouter);
+        Router router = Router.router(vertx);
+        router.mountSubRouter("/api", apiRouter);
         vertx.createHttpServer().requestHandler(router).listen(8080);
 
         System.out.println("server work on 8080");

@@ -13,12 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.starter.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "vertx.rest")
-public class VertxRestProperties {
+@ConfigurationProperties(prefix = "vertx.web.server")
+public class VertxWebServerProperties {
 
     private String host;
 

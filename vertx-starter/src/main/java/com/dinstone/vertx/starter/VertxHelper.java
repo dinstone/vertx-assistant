@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.starter;
 
 import java.util.concurrent.CompletableFuture;
@@ -32,7 +33,7 @@ public final class VertxHelper {
 
     public static Vertx createVertx(VertxOptions vertxOptions) throws Exception {
         CompletableFuture<Vertx> future = new CompletableFuture<>();
-        if (vertxOptions.isClustered()) {
+        if (vertxOptions.getClusterManager() != null && vertxOptions.getClusterManager().isActive()) {
             Vertx.clusteredVertx(vertxOptions, asyncResult -> {
                 if (asyncResult.succeeded()) {
                     future.complete(asyncResult.result());
@@ -61,16 +62,6 @@ public final class VertxHelper {
         });
 
         return future.get();
-    }
-
-    public static boolean deployVerticle(Vertx vertx, DeploymentOptions deployOptions, VerticleFactory factory,
-            String verticleName) throws Exception {
-        vertx.registerVerticleFactory(factory);
-        try {
-            return deployVerticle(vertx, deployOptions, verticleName);
-        } finally {
-            vertx.unregisterVerticleFactory(factory);
-        }
     }
 
     public static boolean deployVerticle(Vertx vertx, DeploymentOptions deployOptions, Verticle verticle)

@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.starter.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
-@ConfigurationProperties(prefix = "vertx")
-public class VertxProperties {
+@ConfigurationProperties(prefix = "vertx.default")
+public class VertxDefaultProperties {
 
-    private int blockedThreadCheckInterval;
+    private int blockedThreadCheckInterval = 3600000;
 
-    private int eventLoopPoolSize;
+    private int eventLoopPoolSize = 2;
 
-    private int workerPoolSize;
+    private int workerPoolSize = 2;
 
     public int getBlockedThreadCheckInterval() {
         return blockedThreadCheckInterval;
