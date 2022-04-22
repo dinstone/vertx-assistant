@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2016~2019 dinstone<dinstone@163.com>
+ * Copyright (C) 2016~2022 dinstone<dinstone@163.com>
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 package com.dinstone.vertx.starter.config;
 
+import java.util.concurrent.CompletableFuture;
+
 import javax.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +30,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.event.EventListener;
 
-import com.dinstone.vertx.starter.VertxHelper;
 import com.dinstone.vertx.verticle.SpringVerticleFactory;
 import com.dinstone.vertx.verticle.WebServerVerticle;
 
@@ -58,11 +59,20 @@ public class VertxWebServerAutoConfiguration {
 
     @EventListener
     public void deployVerticles(ApplicationReadyEvent event) throws Exception {
-        DeploymentOptions deployOptions = new DeploymentOptions();
-        deployOptions.setInstances(webServerProperties.getInstances());
-        String verticleName = verticleFactory.verticleName(WebServerVerticle.class);
         vertx.registerVerticleFactory(verticleFactory);
-        VertxHelper.deployVerticle(vertx, deployOptions, verticleName);
+
+        DeploymentOptions deployOptions = new DeploymentOptions().setInstances(webServerProperties.getInstances());
+        String verticleName = verticleFactory.verticleName(WebServerVerticle.class);
+
+        CompletableFuture<Boolean> future = new CompletableFuture<>();
+        vertx.deployVerticle(verticleName, deployOptions, deployResponse -> {
+            if (deployResponse.succeeded()) {
+                future.complete(true);
+            } else {
+                future.completeExceptionally(deployResponse.cause());
+            }
+        });
+        future.get();
     }
 
     @Bean

@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.dinstone.vertx</groupId>
     <artifactId>vertx-assistant</artifactId>
-    <version>1.1.1</version>
+    <version>1.1.2</version>
     <packaging>pom</packaging>
     <name>vertx-assistant</name>
     <url>https://github.com/dinstone/vertx-assistant.git</url>
@@ -89,7 +89,6 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-source-plugin</artifactId>
-                    <version>2.4</version>
                     <configuration>
                         <archive>
                             <addMavenDescriptor>false</addMavenDescriptor>
@@ -111,10 +110,10 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-javadoc-plugin</artifactId>
-                    <version>2.10.3</version>
                     <configuration>
-                        <encoding>utf-8</encoding>
-                        <charset>utf-8</charset>
+                        <encoding>UTF-8</encoding>
+                        <charset>UTF-8</charset>
+                        <doclint>none</doclint>
                         <excludePackageNames>*.internal</excludePackageNames>
                     </configuration>
                     <executions>
