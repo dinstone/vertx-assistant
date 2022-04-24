@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.web;
 
 import java.util.ArrayList;
@@ -26,110 +27,105 @@ import com.dinstone.vertx.web.core.RouterContext;
 import io.vertx.core.Handler;
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
-import io.vertx.ext.web.RoutingContext;
 
 /**
  * builde router for web handler
  * 
  * @author dinstone
- *
  */
 public interface RouterBuilder {
 
-	class DefaultRouterBuilder implements RouterBuilder {
-		private final List<Object> handlers = new ArrayList<>();
-		private final List<RouteResolver> resolvers = new ArrayList<>();
-		private final RouterContext routerContext = new RouterContext();
+    class DefaultRouterBuilder implements RouterBuilder {
 
-		private Router router;
+        private final List<Object> handlers = new ArrayList<>();
 
-		public DefaultRouterBuilder(Vertx vertx) {
-			router = Router.router(vertx);
+        private final List<RouteResolver> resolvers = new ArrayList<>();
 
-			converter(new JsonMessageConverter());
-			resolver(new AnnotationRouteResolver());
-		}
+        private final RouterContext routerContext = new RouterContext();
 
-		@Override
-		public RouterBuilder handler(Object handler) {
-			if (handler != null) {
-				if (handler instanceof ExceptionHandler) {
-					routerContext.addExceptionHandler((ExceptionHandler<?>) handler);
-				} else {
-					handlers.add(handler);
-				}
-			}
+        private Router router;
 
-			return this;
-		}
+        public DefaultRouterBuilder(Vertx vertx) {
+            router = Router.router(vertx);
 
-		@Override
-		public RouterBuilder converter(MessageConverter<?> converter) {
-			if (converter != null) {
-				routerContext.addMessageConverter(converter);
-			}
-			return this;
-		}
+            converter(new JsonMessageConverter());
+            resolver(new AnnotationRouteResolver());
+        }
 
-		@Override
-		public RouterBuilder resolver(RouteResolver resolver) {
-			if (resolver != null) {
-				this.resolvers.add(resolver);
-			}
-			return this;
-		}
+        @Override
+        public RouterBuilder handler(Object handler) {
+            if (handler != null) {
+                if (handler instanceof ExceptionHandler) {
+                    routerContext.addExceptionHandler((ExceptionHandler<?>) handler);
+                } else {
+                    handlers.add(handler);
+                }
+            }
 
-		@SuppressWarnings("unchecked")
-		@Override
-		public Router build() {
-			for (Object handler : handlers) {
-				if (handler instanceof Handler) {
-					router.route().handler((Handler<RoutingContext>) handler);
-					continue;
-				}
+            return this;
+        }
 
-				for (RouteResolver resolver : resolvers) {
-					resolver.resolve(routerContext, router, handler);
-				}
-			}
+        @Override
+        public RouterBuilder converter(MessageConverter<?> converter) {
+            if (converter != null) {
+                routerContext.addMessageConverter(converter);
+            }
+            return this;
+        }
 
-			return router;
-		}
+        @Override
+        public RouterBuilder resolver(RouteResolver resolver) {
+            if (resolver != null) {
+                this.resolvers.add(resolver);
+            }
+            return this;
+        }
 
-	}
+        @Override
+        public Router build() {
+            for (Object handler : handlers) {
+                for (RouteResolver resolver : resolvers) {
+                    resolver.resolve(routerContext, router, handler);
+                }
+            }
 
-	public static RouterBuilder create(Vertx vertx) {
-		return new DefaultRouterBuilder(vertx);
-	}
+            return router;
+        }
 
-	/**
-	 * and {@link MessageConverter}
-	 * 
-	 * @param converter
-	 * @return
-	 */
-	public RouterBuilder converter(MessageConverter<?> converter);
+    }
 
-	/**
-	 * add custome route resolver
-	 * 
-	 * @param resolver
-	 * @return
-	 */
-	public RouterBuilder resolver(RouteResolver resolver);
+    public static RouterBuilder create(Vertx vertx) {
+        return new DefaultRouterBuilder(vertx);
+    }
 
-	/**
-	 * add {@link WebHandler} or {@link ExceptionHandler} or {@link Handler} object
-	 * 
-	 * @param handler
-	 * @return
-	 */
-	public RouterBuilder handler(Object handler);
+    /**
+     * and {@link MessageConverter}
+     * 
+     * @param converter
+     * @return
+     */
+    public RouterBuilder converter(MessageConverter<?> converter);
 
-	/**
-	 * parse route definition and build router
-	 * 
-	 * @return
-	 */
-	public Router build();
+    /**
+     * add custome route resolver
+     * 
+     * @param resolver
+     * @return
+     */
+    public RouterBuilder resolver(RouteResolver resolver);
+
+    /**
+     * add {@link WebHandler} or {@link ExceptionHandler} or {@link Handler} object
+     * 
+     * @param handler
+     * @return
+     */
+    public RouterBuilder handler(Object handler);
+
+    /**
+     * parse route definition and build router
+     * 
+     * @return
+     */
+    public Router build();
 }

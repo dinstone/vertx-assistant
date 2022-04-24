@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.web.resolver;
 
 import java.lang.invoke.CallSite;
@@ -21,30 +22,69 @@ import java.lang.invoke.MethodHandle;
 import java.lang.invoke.MethodHandles;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
-import com.dinstone.vertx.web.RouteResolver;
-import com.dinstone.vertx.web.core.RouterContext;
+import com.dinstone.vertx.web.core.AbstractRouteResolver;
+import com.dinstone.vertx.web.model.ArgType;
+import com.dinstone.vertx.web.model.Argument;
+import com.dinstone.vertx.web.model.RouteDefinition;
 
 import io.vertx.core.Handler;
+import io.vertx.core.http.HttpServerRequest;
+import io.vertx.core.http.HttpServerResponse;
+import io.vertx.core.impl.logging.Logger;
+import io.vertx.core.impl.logging.LoggerFactory;
 import io.vertx.ext.web.Router;
 import io.vertx.ext.web.RoutingContext;
+import io.vertx.ext.web.Session;
 
-public class MethodNameRouteResolver implements RouteResolver {
+public class MethodNameRouteResolver extends AbstractRouteResolver {
+
+    private static final Logger LOG = LoggerFactory.getLogger(MethodNameRouteResolver.class);
 
     private static final MethodHandles.Lookup LOOKUP = MethodHandles.publicLookup();
+
+    // @Override
+    // public void resolve(RouterContext routerContext, Router router, Object service) {
+    // Class<? extends Object> clazz = service.getClass();
+    // for (final Method method : clazz.getMethods()) {
+    // try {
+    // // skip static methods
+    // int modifiers = method.getModifiers();
+    // if (!Modifier.isPublic(modifiers) || Modifier.isStatic(modifiers) || Modifier.isNative(modifiers)) {
+    // continue;
+    // }
+    //
+    // if (method.getDeclaringClass().isInstance(Object.class)) {
+    // continue;
+    // }
+    //
+    // String methodName = method.getName();
+    // if ("equals".equals(methodName) || "hashCode".equals(methodName) || "toString".equals(methodName)) {
+    // continue;
+    // }
+    //
+    // process(router, service, clazz, method);
+    // } catch (Throwable e) {
+    // LOG.warn("parse route definition error by method " + method, e);
+    // }
+    // }
+    // }
 
     public void process(Router router, Object instance, Class<?> clazz, Method method) {
         MethodHandle methodHandle = getMethodHandle(method, RoutingContext.class);
         if (methodHandle != null) {
-            String servicePath = getServicePath(clazz);
-            String path = "/" + servicePath + "/" + getApiPath(method);
+            String path = getServicePath(clazz) + getMehtodPath(method);
             router.route(path).handler(wrap(instance, methodHandle));
             System.out.println("route path : " + path);
         }
     }
 
-    private String getApiPath(Method method) {
-        return method.getName();
+    private String getMehtodPath(Method method) {
+        return "/" + method.getName();
     }
 
     public static MethodHandle getMethodHandle(Method m, Class<?>... paramTypes) {
@@ -82,7 +122,7 @@ public class MethodNameRouteResolver implements RouteResolver {
     }
 
     private String getServicePath(Class<?> clazz) {
-        return clazz.getSimpleName();
+        return "/" + clazz.getSimpleName();
     }
 
     private static Handler<RoutingContext> wrap(final Object instance, final MethodHandle mh) {
@@ -100,10 +140,57 @@ public class MethodNameRouteResolver implements RouteResolver {
         };
     }
 
-	@Override
-	public void resolve(RouterContext converters, Router router, Object service) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    protected List<RouteDefinition> parseRouteDefinitions(Object service) {
+        List<RouteDefinition> routeDefinitions = new LinkedList<>();
+        Class<? extends Object> clazz = service.getClass();
+        for (final Method method : clazz.getMethods()) {
+            try {
+                // skip static methods
+                int modifiers = method.getModifiers();
+                if (!Modifier.isPublic(modifiers) || Modifier.isStatic(modifiers) || Modifier.isNative(modifiers)) {
+                    continue;
+                }
+
+                if (method.getDeclaringClass().isInstance(Object.class)) {
+                    continue;
+                }
+
+                String methodName = method.getName();
+                if ("equals".equals(methodName) || "hashCode".equals(methodName) || "toString".equals(methodName)) {
+                    continue;
+                }
+
+                RouteDefinition definition = new RouteDefinition(getServicePath(clazz), null, null, method);
+                definition.setMethodPath(getMehtodPath(method));
+                definition.setArguments(getArguments(method));
+                definition.setReturnType(method.getReturnType());
+
+                routeDefinitions.add(definition);
+            } catch (Throwable e) {
+                LOG.warn("parse route definition error by method " + method, e);
+            }
+        }
+
+        return routeDefinitions;
+    }
+
+    private List<Argument> getArguments(Method method) {
+        List<Argument> arguments = new ArrayList<>(method.getParameterCount());
+
+        Parameter[] parameters = method.getParameters();
+        for (int i = 0; i < method.getParameterCount(); i++) {
+            Class<?> paramClazz = parameters[i].getType();
+            if (paramClazz.isAssignableFrom(RoutingContext.class)
+                    || paramClazz.isAssignableFrom(HttpServerResponse.class)
+                    || paramClazz.isAssignableFrom(HttpServerRequest.class)
+                    || paramClazz.isAssignableFrom(RouteDefinition.class)
+                    || paramClazz.isAssignableFrom(Session.class)) {
+                arguments.add(new Argument(i, parameters[i].getName(), parameters[i].getType(), ArgType.CONTEXT));
+            }
+        }
+
+        return arguments;
+    }
 
 }

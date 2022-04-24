@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.web.model;
 
 /**
@@ -21,49 +22,49 @@ package com.dinstone.vertx.web.model;
 public enum ArgType {
 
     /**
-     * without annotation
+     * unknown type
      */
-    unknown(""),
+    UNKNOWN(""),
 
     /**
-     * REST path parameter
+     * Http path parameter
      */
-    path("@PathParam"),
+    PATH("@PathParam"),
 
     /**
-     * Rest query parameter
+     * Http query parameter
      */
-    query("@QueryParam"),
+    QUERY("@QueryParam"),
 
     /**
      * Cookie in request
      */
-    cookie("@CookieParam"),
+    COOKIE("@CookieParam"),
 
     /**
      * Form parameter
      */
-    form("@FormParam"),
+    FORM("@FormParam"),
 
     /**
      * Request header
      */
-    header("@HeaderParam"),
+    HEADER("@HeaderParam"),
 
     /**
      * Matrix parameter
      */
-    matrix("@MatrixParam"),
+    MATRIX("@MatrixParam"),
 
     /**
      * Request body
      */
-    body("@BeanParam"),
+    BODY("@BeanParam"),
 
     /**
-     * Any Vert.x available context ...
+     * Any Vert.x available context
      */
-    context("@Context");
+    CONTEXT("@Context");
 
     private final String description;
 

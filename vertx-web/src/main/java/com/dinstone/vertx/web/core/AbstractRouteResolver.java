@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package com.dinstone.vertx.web.core;
 
 import java.lang.reflect.InvocationTargetException;
@@ -53,20 +54,22 @@ public abstract class AbstractRouteResolver implements RouteResolver {
             }
 
             Route route = null;
-            HttpMethod httpMethod = HttpMethod.valueOf(definition.getHttpMethod());
             if (definition.pathIsRegex()) {
-                route = router.routeWithRegex(httpMethod, definition.getRoutePath());
+                route = router.routeWithRegex(definition.getRoutePath());
             } else {
-                route = router.route(httpMethod, definition.getRoutePath());
+                route = router.route(definition.getRoutePath());
             }
-
+            // http method setting
+            if (definition.getHttpMethod() != null) {
+                route.method(HttpMethod.valueOf(definition.getHttpMethod()));
+            }
             // only register if request with body
             if (definition.hasBody() && definition.getConsumes() != null) {
                 for (String item : definition.getConsumes()) {
                     route.consumes(item);
                 }
             }
-
+            // produces setting
             if (definition.getProduces() != null) {
                 for (String item : definition.getProduces()) {
                     // ignore charset when binding
@@ -210,32 +213,32 @@ public abstract class AbstractRouteResolver implements RouteResolver {
         Object[] arguments = new Object[parameters.size()];
         for (Argument parameter : parameters) {
             switch (parameter.getArgType()) {
-                case context:
+                case CONTEXT:
                     arguments[parameter.getParamIndex()] = getContextValue(definition, context, parameter);
                     break;
-                case cookie:
+                case COOKIE:
                     Cookie cookie = context.request().getCookie(parameter.getParamName());
                     arguments[parameter.getParamIndex()] = cookie == null ? null : cookie.getValue();
-                case header:
+                case HEADER:
                     arguments[parameter.getParamIndex()] = context.request().getHeader(parameter.getParamName());
                     break;
-                case path:
+                case PATH:
                     String pathParam = context.request().getParam(parameter.getParamName());
                     arguments[parameter.getParamIndex()] = convertValue(parameter.getParamClazz(), pathParam);
                     break;
-                case query:
+                case QUERY:
                     String queryParam = context.request().getParam(parameter.getParamName());
                     arguments[parameter.getParamIndex()] = convertValue(parameter.getParamClazz(), queryParam);
                     break;
-                case form:
+                case FORM:
                     String formParam = context.request().getParam(parameter.getParamName());
                     arguments[parameter.getParamIndex()] = convertValue(parameter.getParamClazz(), formParam);
                     break;
-                case matrix:
+                case MATRIX:
                     String matrixParam = getMatrixParam(context.request(), parameter.getParamName());
                     arguments[parameter.getParamIndex()] = convertValue(parameter.getParamClazz(), matrixParam);
                     break;
-                case body:
+                case BODY:
                     arguments[parameter.getParamIndex()] = convertBean(definition, context, parameter, routerContext);
                     break;
                 default:

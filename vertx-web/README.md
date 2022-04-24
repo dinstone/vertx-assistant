@@ -5,7 +5,7 @@ define a web service interface:
 
 ```java
 
-@Path("/hello")
+@WebHandler("/hello")
 public static class HelloResource {
 
     @Get

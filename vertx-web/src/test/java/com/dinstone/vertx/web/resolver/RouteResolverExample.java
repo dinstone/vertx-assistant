@@ -17,6 +17,7 @@ package com.dinstone.vertx.web.resolver;
 
 import com.dinstone.vertx.web.RouterBuilder;
 import com.dinstone.vertx.web.resource.HelloResource;
+import com.dinstone.vertx.web.resource.WebFilter;
 
 import io.vertx.core.Vertx;
 import io.vertx.ext.web.Router;
@@ -27,7 +28,7 @@ public class RouteResolverExample {
         Vertx vertx = Vertx.vertx();
 
         RouterBuilder builder = RouterBuilder.create(vertx).resolver(new MethodNameRouteResolver());
-        Router apiRouter = builder.handler(new HelloResource()).build();
+        Router apiRouter = builder.handler(new WebFilter()).handler(new HelloResource()).build();
 
         Router router = Router.router(vertx);
         router.mountSubRouter("/api", apiRouter);

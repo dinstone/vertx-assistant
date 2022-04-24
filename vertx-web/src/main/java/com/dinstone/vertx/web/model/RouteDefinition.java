@@ -160,7 +160,7 @@ public class RouteDefinition {
 			return false;
 		}
 
-		return arguments.stream().anyMatch(arg -> ArgType.cookie.equals(arg.getArgType()));
+		return arguments.stream().anyMatch(arg -> ArgType.COOKIE.equals(arg.getArgType()));
 	}
 
 	@Override
